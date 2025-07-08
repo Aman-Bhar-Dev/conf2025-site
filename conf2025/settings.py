@@ -85,12 +85,14 @@ WSGI_APPLICATION = "conf2025.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+import dj_database_url
+
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
-    }
+    "default": dj_database_url.config(
+        default=config("DATABASE_URL")  # This should be set in Render's environment variables
+    )
 }
+
 
 
 # Password validation
