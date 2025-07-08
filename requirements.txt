@@ -12,3 +12,5 @@ python-decouple==3.8
 sqlparse==0.5.3
 tablib==3.8.0
 tzdata==2025.2
+gunicorn
+psycopg2-binary
