@@ -1,0 +1,5 @@
+Django==5.2.3
+gunicorn
+python-decouple
+psycopg2-binary
+django-import-export

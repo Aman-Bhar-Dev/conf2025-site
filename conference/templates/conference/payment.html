@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payment | IBSSC2025</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+</head>
+<body class="bg-gray-100 py-10 px-4">
+  <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md p-8">
+    <h2 class="text-3xl font-bold text-[#a6212a] mb-6 text-center">Review Registration & Payment Details</h2>
+
+    <section class="mb-6">
+      <h3 class="text-xl font-semibold mb-2">Main Author Details</h3>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-gray-800">
+        <div><strong>Name:</strong> {{ submission.name }}</div>
+        <div><strong>Email:</strong> {{ submission.user.email }}</div>
+        <div><strong>Institute:</strong> {{ submission.institute }}</div>
+        <div><strong>Mode of Attendance:</strong> {{ registration.author_mode }}</div>
+        <div class="sm:col-span-2 text-lg font-semibold text-green-600 mt-2">
+          Total Fee Applicable: ₹{{ registration.total_amount }}
+        </div>
+      </div>
+    </section>
+
+    {% if participants %}
+    <section class="mb-6">
+      <h3 class="text-xl font-semibold mb-2">Co-authors & Visitors</h3>
+      <table class="w-full text-sm border border-gray-300">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-3 py-2 text-left">Name</th>
+            <th class="px-3 py-2 text-left">Role</th>
+            <th class="px-3 py-2 text-left">Email</th>
+            <th class="px-3 py-2 text-left">Mode</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in participants %}
+          <tr class="border-t">
+            <td class="px-3 py-2">{{ p.name }}</td>
+            <td class="px-3 py-2">{{ p.role }}</td>
+            <td class="px-3 py-2">{{ p.email }}</td>
+            <td class="px-3 py-2">{{ p.mode }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+    {% endif %}
+
+    <section class="bg-yellow-100 border border-yellow-300 text-yellow-900 p-4 rounded-md mb-6">
+      <h4 class="text-lg font-semibold mb-2">Important Notice</h4>
+<p>
+  The payment system is currently under development and will be available soon.
+  Please keep a note of the total amount applicable based on your participation details.
+  You will receive an email once the payment portal is live.
+  <br><br>
+  ✅ Please join the
+<div class="text-center mt-4">
+  <a href="https://chat.whatsapp.com/CPEaa6ek2ur0q6vL7nHJGT"
+     class="btn-whatsapp bg-green-600 hover:bg-green-700 text-white"
+     target="_blank"
+     style="display: inline-block; padding: 12px 24px; font-size: 16px; border-radius: 8px; font-weight: bold; text-decoration: none;">
+    ✅ Join WhatsApp Group for Updates
+  </a>
+</div>
+
+
+</p>
+
+
+    <!-- Edit Checkout Info -->
+    <div class="mt-4 text-center">
+      <a href="{% url 'checkout' submission.paper_id %}" class="inline-block px-4 py-2 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition">
+        ✏️ Edit Registration Details
+      </a>
+    </div>
+
+    <div class="mt-6 text-center">
+      <a href="{% url 'profile' %}" class="text-blue-500 hover:underline">← Back to Profile</a>
+    </div>
+  </div>
+</body>
+</html>

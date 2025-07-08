@@ -1,0 +1,231 @@
+/* ===== Root Variables ===== */
+:root {
+  --primary-color: #a6212a;
+  --primary-hover: #85191f;
+  --background: url("../images/bhutan-mountains.jpg") no-repeat center center;
+  --background-color: rgba(250, 240, 220, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --text-color: #2a1f14;
+  --border-color: #ccc;
+  --button-bg: #f4c542;
+  --button-text: #000;
+  --form-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+/* ===== Base Reset ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--background);
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--text-color);
+  line-height: 1.6;
+  padding-bottom: 3rem;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary-color);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.logo span {
+  color: var(--button-bg);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--button-bg);
+}
+
+/* ===== Form Styles ===== */
+.form-wrapper {
+  max-width: 900px;
+  margin: 3rem auto;
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: var(--form-shadow);
+  backdrop-filter: blur(4px);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: var(--primary-color);
+}
+
+.submission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-card {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+}
+
+.form-card label {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  font-size: 0.95rem;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.add-button,
+.submit-button,
+.reset-button {
+  padding: 0.7rem 1.5rem;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 0.5rem;
+  transition: background 0.3s ease;
+}
+
+.add-button:hover,
+.submit-button:hover,
+.reset-button:hover {
+  background: var(--primary-hover);
+  color: #fff;
+}
+
+.co-author-group {
+  border: 1px dashed #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  position: relative;
+  background: rgba(255,255,255,0.85);
+}
+
+.remove-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: #ff4d4d;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-weight: bold;
+  line-height: 24px;
+  text-align: center;
+}
+
+.remove-button:hover {
+  background: #d40000;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: var(--primary-color);
+    position: absolute;
+    top: 64px;
+    right: 2rem;
+    width: auto;
+    padding: 1rem;
+    border-radius: 5px;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .form-wrapper {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  .add-button,
+  .submit-button,
+  .reset-button {
+    width: 100%;
+  }
+}
+.strength-indicator {
+  font-size: 0.9rem;
+  margin-top: 4px;
+  display: block;
+}
+
+.strength-weak { color: red; }
+.strength-medium { color: orange; }
+.strength-strong { color: green; }

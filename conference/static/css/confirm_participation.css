@@ -1,0 +1,106 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f9fafb;
+  margin: 0;
+  padding: 0;
+}
+
+.navbar {
+  background: #a6212a;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  color: white;
+}
+
+.navbar .logo span {
+  font-weight: bold;
+}
+
+.navbar .nav-links {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.navbar .nav-links a {
+  color: white;
+  text-decoration: none;
+}
+
+.form-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.card {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.card h3 {
+  margin-top: 0;
+  color: #a6212a;
+}
+
+.coauthor-block {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed #ccc;
+}
+
+label {
+  display: block;
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+input[type="file"],
+select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 0.3rem;
+}
+
+.buttons {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.submit-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.submit-btn:hover {
+  background-color: #218838;
+}
+.btn-whatsapp {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 1rem;
+  background-color: #25D366;
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.btn-whatsapp:hover {
+  background-color: #1ebe5d;
+  text-decoration: none;
+}
+

@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Submission</title>
+  <link rel="stylesheet" href="{% static 'css/submit.css' %}">
+</head>
+<body>
+  <div class="form-wrapper">
+    <h2>Edit Paper: {{ paper.title }}</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <p>
+        <label for="{{ form.name.id_for_label }}">Name:</label>
+        {{ form.name }}
+      </p>
+
+      <p>
+        <label for="{{ form.institute.id_for_label }}">Institute:</label>
+        {{ form.institute }}
+      </p>
+
+      <p>
+        <label for="{{ form.designation.id_for_label }}">Designation:</label>
+        {{ form.designation }}
+      </p>
+
+      <p>
+        <label for="{{ form.keywords.id_for_label }}">Keywords:</label>
+        {{ form.keywords }}
+      </p>
+
+      <p>
+        <label for="{{ form.abstract_file.id_for_label }}">Abstract File:</label>
+        {{ form.abstract_file }}
+      </p>
+
+      <h3>Co-Authors</h3>
+      {{ formset.management_form }}
+
+      <div id="coauthors">
+        {% for coauthor_form in formset %}
+          <div class="coauthor-form">
+            {% for hidden in coauthor_form.hidden_fields %}
+              {{ hidden }}
+            {% endfor %}
+            {% for field in coauthor_form.visible_fields %}
+              <p>
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field }}
+                {% if field.errors %}
+                  <div style="color:red;">{{ field.errors }}</div>
+                {% endif %}
+              </p>
+            {% endfor %}
+            {% if coauthor_form.instance.pk %}
+              <p><label>Delete:</label> {{ coauthor_form.DELETE }}</p>
+            {% endif %}
+            <hr>
+          </div>
+        {% endfor %}
+      </div>
+
+      <button type="button" id="add-coauthor" class="submit-button" style="margin-top:10px;">+ Add Co-author</button>
+
+      <br><br>
+      <button type="submit" class="submit-button">Save Changes</button>
+      <a href="{% url 'profile' %}" class="reset-button">Cancel</a>
+    </form>
+  </div>
+
+  <template id="empty-form-template">
+    <div class="coauthor-form">
+      REPLACE_ME
+      <hr>
+    </div>
+  </template>
+
+  <script>
+    const formsetDiv = document.getElementById('coauthors');
+    const addButton = document.getElementById('add-coauthor');
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+
+    // Save one empty rendered form for cloning
+    const emptyFormHTML = `{{ formset.empty_form.as_p|escapejs }}`;
+
+    addButton.addEventListener('click', function () {
+      const formCount = parseInt(totalForms.value);
+      const newFormHtml = emptyFormHTML.replace(/__prefix__/g, formCount);
+      const container = document.createElement('div');
+      container.innerHTML = newFormHtml;
+      container.classList.add('coauthor-form');
+      container.innerHTML += '<hr>';
+      formsetDiv.appendChild(container);
+      totalForms.value = formCount + 1;
+    });
+  </script>
+</body>
+</html>

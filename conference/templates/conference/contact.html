@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Contact | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">Conf<span>2025</span></div>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      <li><a href="{% url 'contact' %}" class="active">Contact</a></li>
+    </ul>
+  </header>
+
+  <main class="contact-container">
+    <h2>Contact Information</h2>
+
+    <section class="contact-section">
+      <h3>Conference Coordinators</h3>
+      <ul>
+        <li><strong>Dr. Nilanjana Chakrabarty</strong><br>
+          📞 +91 94353 79955<br>
+          ✉️ <a href="mailto:nilanjanachakrabarty.aus@gmail.com">nilanjanachakrabarty.aus@gmail.com</a>
+        </li>
+        <li><strong>Dr. Deepjyoti Choudhury</strong><br>
+          📞 +91 94012 94696<br>
+          ✉️ <a href="mailto:choudhurydeepjyoti@gmail.com">choudhurydeepjyoti@gmail.com</a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="contact-section">
+      <h3>Abstract and Paper Queries</h3>
+      <ul>
+        <li><strong>Mr. Tanmoy Acharjee</strong> — 📞 +91 99544 68439</li>
+        <li><strong>Mr. Somanuj Dey</strong> — 📞 +91 70864 34977</li>
+      </ul>
+    </section>
+
+    <section class="contact-section">
+      <h3>Travel and Stay Queries</h3>
+      <ul>
+        <li><strong>Mr. Ashif Ansari</strong> — 📞 +91 70020 63112</li>
+      </ul>
+    </section>
+
+    <section class="contact-section">
+      <h3>Registration and Fees Queries</h3>
+      <ul>
+        <li><strong>Ms. Jimpi Sonowal</strong> — 📞 +91 81350 60062</li>
+      </ul>
+    </section>
+
+    <section class="contact-section">
+      <h3>Technical Support</h3>
+      <ul>
+        <li><strong>Mr. Aman Bhar</strong> — 📞 +91 80991 42522</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>© 2025 Assam University Silchar | Conf2025</p>
+  </footer>
+</body>
+</html>

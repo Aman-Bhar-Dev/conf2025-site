@@ -1,0 +1,291 @@
+/* ===== Root Variables ===== */
+:root {
+  --primary-color: #a6212a;
+  --primary-hover: #85191f;
+  --background: url("../images/bhutan-mountains.jpg") no-repeat center center;
+  --background-color: rgba(250, 240, 220, 0.9);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --text-color: #2a1f14;
+  --border-color: #ccc;
+  --button-bg: #f4c542;
+  --button-text: #000;
+  --form-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+}
+
+/* ===== Base Reset ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--background);
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--text-color);
+  line-height: 1.6;
+  padding-bottom: 3rem;
+}
+
+/* ===== Navbar ===== */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary-color);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.logo span {
+  color: var(--button-bg);
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 1.2rem;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: white;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--button-bg);
+}
+
+/* ===== Profile Container ===== */
+.profile-container {
+  max-width: 900px;
+  margin: 4rem auto;
+  background: var(--card-bg);
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: var(--form-shadow);
+  backdrop-filter: blur(6px);
+}
+
+.profile-container h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+}
+
+.profile-info {
+  margin-top: 1rem;
+}
+
+.profile-info label {
+  font-weight: bold;
+  display: block;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+}
+
+.profile-info p {
+  background: #fff;
+  padding: 0.6rem;
+  border-radius: 5px;
+  border: 1px solid var(--border-color);
+  font-size: 1rem;
+}
+
+.profile-actions {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.profile-actions a,
+.profile-actions button {
+  padding: 0.7rem 1.4rem;
+  background-color: var(--button-bg);
+  color: var(--button-text);
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  text-decoration: none;
+}
+
+.profile-actions a:hover,
+.profile-actions button:hover {
+  background-color: var(--primary-hover);
+  color: #fff;
+}
+
+/* ===== Submission Table ===== */
+.submission-list {
+  margin-top: 2rem;
+}
+
+.submission-list h3 {
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+  text-align: center;
+}
+
+.submission-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--form-shadow);
+}
+
+.submission-table thead {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.submission-table th,
+.submission-table td {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+  font-size: 0.95rem;
+}
+
+.submission-table td a,
+.submission-table td button {
+  color: var(--primary-color);
+  font-weight: 500;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.submission-table td a:hover,
+.submission-table td button:hover {
+  text-decoration: underline;
+}
+
+.status {
+  padding: 0.3rem 0.6rem;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+.status.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+.status.approved {
+  background: #d4edda;
+  color: #155724;
+}
+.status.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.pay-button,
+.upload-label {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary-color);
+  color: #fff;
+  border-radius: 5px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+.pay-button:hover,
+.upload-label:hover {
+  background-color: var(--primary-hover);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: var(--primary-color);
+    position: absolute;
+    top: 64px;
+    right: 2rem;
+    width: auto;
+    padding: 1rem;
+    border-radius: 5px;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+
+  .profile-container {
+    margin: 2rem;
+    padding: 1.5rem;
+  }
+
+  .profile-actions {
+    flex-direction: column;
+  }
+
+  .submission-table thead {
+    display: none;
+  }
+
+  .submission-table, .submission-table tbody, .submission-table tr, .submission-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .submission-table tr {
+    margin-bottom: 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    background: #fff;
+    padding: 1rem;
+    box-shadow: var(--form-shadow);
+  }
+
+  .submission-table td {
+    padding: 0.6rem 0;
+  }
+
+  .submission-table td::before {
+    display: inline-block;
+    font-weight: bold;
+    color: var(--primary-color);
+    content: attr(data-label) ": ";
+    width: 100%;
+    margin-bottom: 0.2rem;
+  }
+}
+.pay-button.disabled {
+  background-color: #ccc;
+  color: #444;
+  pointer-events: none;
+}

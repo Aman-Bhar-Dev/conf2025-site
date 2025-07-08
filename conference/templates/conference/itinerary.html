@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Itinerary | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/itenary.css' %}" />
+  <script defer src="{% static 'js/itenary.js' %}"></script>
+</head>
+<body>
+  <header class="navbar">
+    <div class="logo">Conf<span>2025</span></div>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{%url 'itinerary'%}" class=active>Itinerary</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      <li><a href="{% url 'contact' %}" >Contact</a></li>
+    </ul>
+  </header>
+
+  <header class="hero">
+    <div class="overlay"></div>
+    <div class="hero-content">
+      <h1>Conference Itinerary</h1>
+      <p>A glimpse into the journey, destinations, and memories to be made.</p>
+    </div>
+  </header>
+
+  <section class="intro">
+    <div class="container">
+      <h2>Travel Itinerary</h2>
+      <p>
+        The onward journey to the Bhutan International Conference 2025 begins on <strong>2nd September at 6 AM</strong> from <strong>New Cooch Behar (West Bengal)</strong>. All participants will travel together by bus to <strong>Thimphu/Paro, Bhutan</strong>. The travel experience will be coordinated and guided by <strong>Dr. Lhato Jamba</strong>. This shared journey is designed to offer participants a chance to connect even before the conference officially begins.<br><br>
+        The return journey is scheduled for <strong>6th September at 7 AM</strong>, departing from Bhutan and heading back to New Cooch Behar.
+      </p>
+    </div>
+  </section>
+
+  <section class="journey-visual">
+    <div class="container">
+      <h2>Journey Highlights</h2>
+      <div class="image-grid">
+        <div class="card"><img src="{% static 'images/new_cooch_behar.jpg' %}" alt="New Cooch Behar"><p>New Cooch Behar (Start Point)</p></div>
+        <div class="card"><img src="{% static 'images/indo-bhutan-border.jpg' %}" alt="Indo-Bhutan Border"><p>Indo-Bhutan Border</p></div>
+        <div class="card"><img src="{% static 'images/thimphu.jpg' %}" alt="Thimphu"><p>Thimphu</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sightseeing">
+    <div class="container">
+      <h2>Free Sightseeing Tour</h2>
+      <p>All registered participants will be treated to a curated sightseeing experience in Bhutan. Here are some of the  places you’ll visit:</p>
+      <div class="sight-grid">
+        <div class="sight-card"><img src="{% static 'images/taktsang.jpg' %}" alt="Tiger's Nest Monastery"><p>Tiger’s Nest Monastery</p></div>
+        <div class="sight-card"><img src="{% static 'images/memorial-chorten.jpg' %}" alt="Memorial Chorten"><p>Memorial Chorten, Thimphu</p></div>
+        <div class="sight-card"><img src="{% static 'images/buddha-point.jpg' %}" alt="Buddha Dordenma"><p>Buddha Dordenma Statue</p></div>
+        <div class="sight-card"><img src="{% static 'images/punakha-dzong.jpg' %}" alt="Punakha Dzong"><p>Punakha Dzong</p></div>
+        <div class="sight-card"><img src="{% static 'images/paro-market.jpg' %}" alt="Paro Market"><p>Local Bhutanese Market</p></div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>

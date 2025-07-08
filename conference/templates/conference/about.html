@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>About | Conf2025</title>
+  <link rel="stylesheet" href="{% static 'css/about.css' %}">
+</head>
+<body>
+
+  <!-- Background Image Layer -->
+  <div class="about-page-bg"></div>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="logo">IBSSC<span>2025</span></div>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'about' %}" class="active">About</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+    </ul>
+  </header>
+
+  <!-- Main Content -->
+  <main class="about-container">
+    <!-- Conference Secretariat -->
+    <section class="organizers-section">
+      <h2>Conference Secretariat</h2>
+
+      <h3>Chief Patron</h3>
+      <ul>
+        <li>Prof. Rajive Mohan Pant, Vice Chancellor, Assam University</li>
+      </ul>
+
+      <h3>Patron(s)</h3>
+      <ul>
+        <li>Prof. H Ramananda Singh, Dean, J.N School of Management Studies, Assam University</li>
+        <li>Dr. Shiva Raj Bhattarai, President, Royal Thimphu College & Former Dean of Academic Affairs, RTC</li>
+      </ul>
+
+      <h3>Conference Director</h3>
+      <ul>
+        <li>Prof. Debomalya Ghosh, Head, Department of Business Administration, Assam University</li>
+      </ul>
+
+      <h3>Conference Convenor</h3>
+      <ul>
+        <li>Dr. Deepjyoti Choudhury, Assistant Professor, Department of Business Administration</li>
+      </ul>
+
+      <h3>Conference Co-Convenor</h3>
+      <ul>
+        <li>Dr. Nilanjana Chakrabarty, Assistant Professor, Department of Business Administration</li>
+      </ul>
+
+      <h3>Conference Local Organising Secretary</h3>
+      <ul>
+        <li>Dr. Lhato Jamba, Founding Director of Gedu College of Business Studies and GCIT, Bhutan</li>
+      </ul>
+
+      <h3>Members of Organising Committee</h3>
+      <ul>
+        <li>Prof. A L Ghosh</li>
+        <li>Dr. Joyeeta Deb</li>
+        <li>Dr. Juthika Konwar</li>
+        <li>Dr. Habib Laskar</li>
+        <li>Dr. Amit Kumar Das</li>
+        <li>Dr. Lurai Rongmei</li>
+        <li>Mr. Saurav Dey</li>
+        <li>Dr. Kalyan Das</li>
+        <span class="note">All from Department of Business Administration, Assam University</span>
+      </ul>
+
+      <h3>Conference Advisory Committee</h3>
+      <ul>
+        <li>Prof. S. S Sarkar, Tezpur University, India</li>
+        <li>Prof. L S Sharma, Mizoram University, India</li>
+        <li>Prof. Ibohal Maetai, Manipur University, India</li>
+        <li>Prof. F. B Singh, BHU, Varanasi, India</li>
+        <li>Prof. Surya Prakash, Delhi University, India</li>
+        <li>Dr. Amnuay Wattananikornsi, Surindra Rajabhat University, Thailand</li>
+        <li>Dr. Surendra Mahato, Tribhuvan University, Nepal</li>
+      </ul>
+
+      <h3>Scholar/Student Coordinator(s)</h3>
+      <ul>
+        <li>Mr. Tanmoy Acharya</li>
+        <li>Mr. Somanuj Dey</li>
+        <li>Ms. Jimpi Sonowal</li>
+        <li>Mr. Ashif Ansar</li>
+        <li>Mr. Aman Bhar</li>
+        <span class="note">All from Assam University</span>
+      </ul>
+    </section>
+
+    <!-- Other Sections -->
+    <section>
+      <h2>ABOUT ASSAM UNIVERSITY</h2>
+      <p>Assam University came into existence in 1994 after enactment of the Assam (Central) University Act 1989. Through its pursuit, Assam University is in the process of making itself an institute of excellence...</p>
+    </section>
+
+    <section>
+      <h2>ABOUT THE DEPARTMENT</h2>
+      <p>The Department of Business Administration (DBA), an AICTE approved Department, started functioning in July 1997...</p>
+    </section>
+
+    <section>
+      <h2>ABOUT ROYAL THIMPU COLLEGE, BHUTAN</h2>
+      <p>Affiliated with the Royal University of Bhutan (RUB)...</p>
+    </section>
+
+    <section>
+      <h2>ABOUT THE CONFERENCE</h2>
+      <p>In today’s rapidly evolving world... </p>
+      <h3>Objectives</h3>
+      <ul>
+        <li>To examine how social science research can drive policy reforms and inclusive governance.</li>
+        <li>To explore interdisciplinary collaborations across economics, technology, ethics, and culture.</li>
+        <li>To assess the impact of digitalization and globalization on social justice and equity.</li>
+        <li>To foster knowledge-sharing platforms between scholars, practitioners, and civil society leaders.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>WHO CAN BE THE PARTICIPANT</h2>
+      <p>The conference is aimed at providing a meeting ground for the Intellectual and Professional experts...</p>
+      <ul>
+        <li>Academicians</li>
+        <li>Policy Makers</li>
+        <li>Research Scholars</li>
+        <li>Entrepreneurs</li>
+        <li>Management Professionals</li>
+        <li>Students</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>CORE AND SUBTHEMES OF THE CONFERENCE</h2>
+      <ol>
+        <li><strong>Society, Equity, Transformation & Social Work:</strong> Caste, Class & Gender in the 21st Century...</li>
+        <li><strong>Knowledge, Education & Human Development:</strong> Rethinking Curriculum for the Digital Age...</li>
+        <li><strong>Politics, Governance, Public Policy, and Political Science:</strong> Democratic Values in a Polarized World...</li>
+        <li><strong>Economy, Technology & Social Impact:</strong> Digital Economies and the Future of Work...</li>
+        <li><strong>Culture, Identity & Globalization:</strong> Media Narratives, Cinema, and National Identity...</li>
+        <li><strong>Environment, Climate & Sustainability:</strong> Climate Justice and Environmental Ethics...</li>
+        <li><strong>Business and Commerce and Business Sustainability:</strong> Digital Transformation, e-commerce...</li>
+        <li><strong>General Social Science and topics not falling under the above categories:</strong> Mental Health and Mental Well-being...</li>
+      </ol>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2025 Assam University Silchar | Conf2025</p>
+  </footer>
+
+</body>
+</html>

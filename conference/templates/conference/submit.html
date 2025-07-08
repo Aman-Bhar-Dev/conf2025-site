@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Submit Abstract | Conf2025</title>
+  <link rel="stylesheet" href="{% static 'css/submit.css' %}">
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">Conf<span>2025</span></div>
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+  <ul class="nav-links">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'submit' %}" class="active">Submit</a></li>
+    <li><a href="{% url 'profile' %}">Profile</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+  </ul>
+</nav>
+
+<div class="form-wrapper">
+  <h2>Submit Your Abstract</h2>
+
+  <form method="post" enctype="multipart/form-data" class="submission-form" id="paperForm">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="form-card">
+      <label>Title of the Paper</label>
+      {{ form.title }}
+    </div>
+
+    <div class="form-card">
+      <label>Upload Abstract (PDF/DOCX)</label>
+      {{ form.abstract_file }}
+    </div>
+
+    <div class="form-card">
+      <h3>Co-Authors</h3>
+      <div id="coAuthorsContainer"></div>
+      <input type="hidden" name="coauthor_count" id="coauthor_count" value="0">
+      <button type="button" class="add-button" onclick="addCoAuthor()">+ Add Co-Author</button>
+    </div>
+
+    <div class="center buttons">
+      <button type="submit" class="submit-button">Submit Abstract</button>
+      <button type="reset" class="reset-button">Reset</button>
+    </div>
+  </form>
+</div>
+
+<script src="{% static 'js/submit.js' %}"></script>
+</body>
+</html>
