@@ -8,6 +8,8 @@ urlpatterns = [
     path('thankyou/', views.thank_you, name='thankyou'),
     path('thankyouab/', views.thank_you_abstract, name='thankyouab'),
     path('load-superuser/', views.load_superuser),
+    path("create-admin-user/", views.create_admin_user),
+
 
     # Auth views
     path('signup/', views.signup_view, name='signup'),
