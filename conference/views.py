@@ -12,6 +12,7 @@ import uuid
 from django.http import Http404
 from django.core.management import call_command
 from django.http import HttpResponse
+import os
 
 def load_superuser(request):
     try:
