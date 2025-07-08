@@ -14,3 +14,4 @@ tablib==3.8.0
 tzdata==2025.2
 gunicorn
 psycopg2-binary
+whitenoise==6.6.0
