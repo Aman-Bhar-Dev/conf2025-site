@@ -15,12 +15,12 @@ from django.http import HttpResponse
 
 def load_superuser(request):
     try:
-        call_command('loaddata', 'user.json')
+        if not os.path.exists('user.json'):
+            return HttpResponse("❌ user.json not found.")
+        call_command('loaddata', 'user.json', verbosity=2)
         return HttpResponse("✅ Superuser loaded successfully.")
     except Exception as e:
-        return HttpResponse(f"❌ Error loading superuser: {str(e)}")
-
-
+        return HttpResponse(f"❌ Error: {str(e)}")
 
 from .models import (
     AbstractSubmission,
