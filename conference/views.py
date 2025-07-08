@@ -15,13 +15,19 @@ from django.http import HttpResponse
 import os
 
 
-def load_superuser(request):
-    try:
-        call_command('migrate')  # Ensure tables exist
-        call_command('loaddata', 'user.json')
-        return HttpResponse("✅ Superuser loaded successfully.")
-    except Exception as e:
-        return HttpResponse(f"❌ Error: {e}")
+from django.contrib.auth.models import User
+from django.http import HttpResponse
+
+def create_admin_user(request):
+    if not User.objects.filter(username='IBSSCMBAAUS').exists():
+        User.objects.create_superuser(
+            username='IBSSCMBAAUS',
+            email='ibsscconf@gmail.com',
+            password='ReplaceWithNewStrongPassword123'
+        )
+        return HttpResponse("✅ Superuser created.")
+    return HttpResponse("⚠️ User already exists.")
+
 
 from .models import (
     AbstractSubmission,
