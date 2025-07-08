@@ -23,7 +23,7 @@ def create_admin_user(request):
         User.objects.create_superuser(
             username='IBSSCMBAAUS',
             email='ibsscconf@gmail.com',
-            password='ReplaceWithNewStrongPassword123'
+            password='DeepjyotiSirMba'
         )
         return HttpResponse("✅ Superuser created.")
     return HttpResponse("⚠️ User already exists.")
