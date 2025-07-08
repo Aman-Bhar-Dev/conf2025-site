@@ -7,7 +7,6 @@ urlpatterns = [
     path('submit/', views.abstract_submit, name='submit'),
     path('thankyou/', views.thank_you, name='thankyou'),
     path('thankyouab/', views.thank_you_abstract, name='thankyouab'),
-    path("create-admin-user/", views.create_admin_user),
 
 
     # Auth views
