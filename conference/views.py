@@ -10,6 +10,17 @@ from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
 import uuid
 from django.http import Http404
+from django.core.management import call_command
+from django.http import HttpResponse
+
+def load_superuser(request):
+    try:
+        call_command('loaddata', 'user.json')
+        return HttpResponse("✅ Superuser loaded successfully.")
+    except Exception as e:
+        return HttpResponse(f"❌ Error loading superuser: {str(e)}")
+
+
 
 from .models import (
     AbstractSubmission,
