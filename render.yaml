@@ -3,6 +3,7 @@ services:
     name: conf2025
     runtime: python
     buildCommand: pip install -r requirements.txt
+    startCommand: "./start.sh"
     startCommand: gunicorn conf2025.wsgi:application
     envVars:
       - key: DJANGO_SETTINGS_MODULE
