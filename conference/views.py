@@ -77,9 +77,9 @@ def signup_view(request):
         )
 
         # ✅ Save phone and institution to the user's profile
-        user.userprofile.phone = phone
-        user.userprofile.institution = institution  # <-- add this if not already saving institution
-        user.userprofile.save()
+        user.profile.phone = phone
+        user.profile.institution = institution  # <-- add this if not already saving institution
+        user.profile.save()
 
         login(request, user)
         return redirect('home')
