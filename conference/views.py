@@ -92,17 +92,28 @@ def logout_view(request):
 
 
 # ============ ABSTRACT SUBMISSION ============ #
+from django.contrib import messages
+from django.core.mail import send_mail
+from django.shortcuts import redirect, render
+from django.contrib.auth.decorators import login_required
+
 @login_required
 def abstract_submit(request):
     if request.method == 'POST':
         form = AbstractSubmissionForm(request.POST, request.FILES)
+        
         if form.is_valid():
+            print("✅ Form is valid.")
+            print("📁 Request.FILES:", request.FILES)
+
             submission = form.save(commit=False)
             submission.user = request.user
             submission.mode_of_participation = request.POST.get('mode_of_participation')
             submission.category = request.POST.get('category')
             submission.email = request.user.email
             submission.main_author = request.user.get_full_name() or request.user.username
+
+            print("📄 Abstract file before save:", submission.abstract_file)
 
             if submission.institute == "Others":
                 custom = form.cleaned_data.get("custom_institute")
@@ -111,11 +122,14 @@ def abstract_submit(request):
 
             submission.save()
 
-            # 🔍 Confirm abstract uploaded
+            # Confirm Cloudinary upload
             if submission.abstract_file:
-                print("✅ Abstract uploaded:", submission.abstract_file.url)
+                print("✅ Abstract uploaded successfully.")
+                print("🌐 Abstract file URL after save:", submission.abstract_file.url)
+            else:
+                print("❌ Abstract file not saved.")
 
-            # Save coauthors
+            # Save co-authors
             for i in range(20):
                 first = request.POST.get(f'coauthor_first_name_{i}')
                 last = request.POST.get(f'coauthor_last_name_{i}')
@@ -139,23 +153,29 @@ def abstract_submit(request):
 
             send_mail(
                 subject="Abstract Submission Received | IBSSC2025",
-                message=f"""Dear {request.user.first_name},
+                message=f"Dear {request.user.first_name},\n\n"
 
-Thank you for submitting your abstract titled "{submission.title}".
-
-Your submission ID is {submission.paper_id}.
-
-You will receive a notification once it is reviewed.
-
-Regards,
-IBSSC2025 Secretariat""",
+        f"Dear {request.user.first_name},\n\n"
+        f"Thank you for submitting your abstract titled \"{submission.title}\".\n\n"
+        f"Your submission ID is {submission.paper_id}.\n\n"
+        "You will receive a notification once it is reviewed.\n\n"
+        "Regards,\n"
+        "IBSSC2025 Secretariat"
                 from_email=None,
                 recipient_list=[request.user.email],
             )
+
+            messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
+        else:
+            print("❌ Form is invalid.")
+            print(form.errors)
+
     else:
         form = AbstractSubmissionForm()
+    
     return render(request, 'conference/abstract_submit.html', {'form': form})
+
 
 
 def thank_you_abstract(request):
