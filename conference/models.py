@@ -73,7 +73,7 @@ class AbstractSubmission(models.Model):
     ]
 
     mode_of_participation = models.CharField(max_length=10, choices=MODE_CHOICES, default='Offline')
-    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='Student')
+    category = models.CharField(max_length=30, choices=CATEGORY_CHOICES, default='Student', blank=True)
     payment_amount = models.IntegerField(default=0)
     payment_status = models.BooleanField(default=False)
 
