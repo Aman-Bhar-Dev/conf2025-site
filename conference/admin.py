@@ -6,11 +6,24 @@ from django.urls import path
 from django.shortcuts import redirect, get_object_or_404
 from django.core.mail import send_mail
 from django.contrib import messages
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from .models import UserProfile
 from .models import AbstractSubmission, CoAuthor
 from .resources import AbstractSubmissionResource
 from .forms import FullPaperUploadForm
 
+class UserProfileInline(admin.StackedInline):
+    model = UserProfile
+    can_delete = False
+    verbose_name_plural = 'Additional Info'
+
+# Extend the existing UserAdmin
+class UserAdmin(BaseUserAdmin):
+    inlines = (UserProfileInline,)
+
+# Re-register the UserAdmin
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 # Inline form for co-authors
 class CoAuthorInline(admin.TabularInline):
