@@ -113,9 +113,11 @@ def logout_view(request):
 @login_required
 def abstract_submit(request):
     if request.method == 'POST':
+        print(request.FILES)
         form = AbstractSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
             submission = form.save(commit=False)
+            print("Saved submission:", submission.abstract_file.url)
             submission.user = request.user
             submission.mode_of_participation = request.POST.get('mode_of_participation')
             submission.category = request.POST.get('category')
