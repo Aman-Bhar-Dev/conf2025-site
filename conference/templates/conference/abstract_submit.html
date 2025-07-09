@@ -51,7 +51,7 @@
       <label for="id_title">Paper Title</label>
       <input type="text" name="title" id="id_title" required>
 
-      <label>Corrosponding Author's Name</label>
+      <label>Corresponding Author's Name</label>
       <input type="text" name="name" required>
 
       <label>Institute</label>
@@ -86,7 +86,7 @@
       </select>
 
       <label>Category</label>
-      <select name="coauthor_category_{{ index }}" required>
+      <select name="category" required>
         <option value="">-- Select --</option>
         <option value="Academician">Academician</option>
         <option value="Corporate">Corporate</option>
@@ -114,13 +114,11 @@
   </form>
 </div>
 
-<!-- ✅ Correctly placed script at end of body -->
 <script>
-  // Main author institute logic
+  // Main author custom institute logic
   document.getElementById("institute-select").addEventListener("change", function () {
     const wrapper = document.getElementById("custom-institute-wrapper");
     const customInput = wrapper.querySelector('input');
-
     if (this.value === "Others") {
       wrapper.classList.remove("hidden");
       customInput.required = true;
@@ -189,19 +187,18 @@
 
   function handleCoAuthorInstituteChange(index) {
     const dropdown = document.querySelector(`select[name="coauthor_institute_${index}"]`);
-    const customInput = document.getElementById(`coauthor-custom-institute-${index}`);
-    const inputField = customInput.querySelector('input');
+    const customInputDiv = document.getElementById(`coauthor-custom-institute-${index}`);
+    const inputField = customInputDiv.querySelector('input');
 
     if (dropdown.value === 'Others') {
-      customInput.style.display = 'block';
+      customInputDiv.style.display = 'block';
       inputField.required = true;
     } else {
-      customInput.style.display = 'none';
+      customInputDiv.style.display = 'none';
       inputField.required = false;
     }
   }
 </script>
-
 
 </body>
 </html>
