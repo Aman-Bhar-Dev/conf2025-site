@@ -48,6 +48,11 @@ def signup_view(request):
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         institution = request.POST.get('institution')
+        if institution == 'Others':
+            custom_institution = request.POST.get('custom_institution')
+            if custom_institution:
+                institution = custom_institution.strip()
+
         password = request.POST.get('password')
         confirm = request.POST.get('confirm-password')
 
@@ -71,8 +76,9 @@ def signup_view(request):
             first_name=full_name
         )
 
-        # ✅ Save phone to the user's profile
+        # ✅ Save phone and institution to the user's profile
         user.userprofile.phone = phone
+        user.userprofile.institution = institution  # <-- add this if not already saving institution
         user.userprofile.save()
 
         login(request, user)
