@@ -11,6 +11,8 @@ from .models import UserProfile
 from .models import AbstractSubmission, CoAuthor
 from .resources import AbstractSubmissionResource
 from .forms import FullPaperUploadForm
+from django.contrib.auth.models import User
+
 
 class UserProfileInline(admin.StackedInline):
     model = UserProfile
