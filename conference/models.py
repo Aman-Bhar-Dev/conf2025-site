@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-
+from cloudinary_storage.storage import MediaCloudinaryStorage
 
 # -------------------------------
 # USER PROFILE (for phone & institute)
@@ -27,7 +27,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 class AbstractSubmission(models.Model):
     main_author = models.CharField(max_length=255)
     email = models.EmailField()
-    abstract_file = models.FileField(upload_to='abstracts/')
+    abstract_file = models.FileField(upload_to='abstracts/', storage=MediaCloudinaryStorage())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     paper_id = models.CharField(max_length=15, unique=True, editable=False, blank=True)
