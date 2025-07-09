@@ -54,8 +54,11 @@ class AbstractSubmissionForm(forms.ModelForm):
             'custom_institute',
             'designation',
             'keywords',
-            'abstract_file'
+            'abstract_file',
+            'mode_of_participation',
+            'category',
         ]
+
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'name': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
