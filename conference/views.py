@@ -151,19 +151,18 @@ def abstract_submit(request):
                         category=category or 'Student'
                     )
 
-            send_mail(
-                subject="Abstract Submission Received | IBSSC2025",
-                message=f"Dear {request.user.first_name},\n\n"
-
-        f"Dear {request.user.first_name},\n\n"
-        f"Thank you for submitting your abstract titled \"{submission.title}\".\n\n"
-        f"Your submission ID is {submission.paper_id}.\n\n"
-        "You will receive a notification once it is reviewed.\n\n"
-        "Regards,\n"
-        "IBSSC2025 Secretariat"
-                from_email=None,
-                recipient_list=[request.user.email],
-            )
+                    send_mail(
+                        subject="IBSSC 2025 - Abstract Submission Confirmation",
+                        message=f"""Dear {request.user.first_name},
+                    
+                    Thank you for submitting your abstract to IBSSC 2025. Our team will review your submission and notify you of the next steps.
+                    
+                    Regards,  
+                    IBSSC2025 Secretariat
+                    """,
+                        from_email=None,
+                        recipient_list=[request.user.email],
+                    )
 
             messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
