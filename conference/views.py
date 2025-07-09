@@ -148,7 +148,7 @@ Your submission ID is {submission.paper_id}.
 You will receive a notification once it is reviewed.
 
 Regards,
-IBSSC2025 Secretariat"",
+IBSSC2025 Secretariat""",
                 from_email=None,
                 recipient_list=[request.user.email],
             )
