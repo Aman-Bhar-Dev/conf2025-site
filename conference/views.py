@@ -1,24 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.http import HttpResponseForbidden
 from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
-import uuid
-from django.http import Http404
-from django.core.management import call_command
-from django.http import HttpResponse
-import os
-
-
-from django.contrib.auth.models import User
-from django.http import HttpResponse
-
-
+from django.http import HttpResponse, HttpResponseForbidden, Http404
+import re
 
 from .models import (
     AbstractSubmission,
@@ -33,15 +23,12 @@ from .forms import (
     FullPaperUploadForm,
 )
 
-import re
-
-
 # ============ HOME ============ #
 def index(request):
     return render(request, 'conference/index.html')
 
 
-# ============ SIGNUP ============ #
+# ============ AUTHENTICATION ============ #
 def signup_view(request):
     if request.method == 'POST':
         full_name = request.POST.get('fullname')
@@ -50,8 +37,7 @@ def signup_view(request):
         institution = request.POST.get('institution')
         if institution == 'Others':
             custom_institution = request.POST.get('custom_institution')
-            if custom_institution:
-                institution = custom_institution.strip()
+            institution = custom_institution.strip() if custom_institution else institution
 
         password = request.POST.get('password')
         confirm = request.POST.get('confirm-password')
@@ -63,9 +49,8 @@ def signup_view(request):
         if User.objects.filter(username=email).exists():
             messages.error(request, "An account with this email already exists.")
             return redirect('signup')
-        
-        password_regex = r'^(?=.*[A-Za-z])(?=.*\d).{8,}$'
-        if not re.match(password_regex, password):
+
+        if not re.match(r'^(?=.*[A-Za-z])(?=.*\d).{8,}$', password):
             messages.error(request, "Password must be at least 8 characters long and include both letters and numbers.")
             return redirect('signup')
 
@@ -76,9 +61,8 @@ def signup_view(request):
             first_name=full_name
         )
 
-        # ✅ Save phone and institution to the user's profile
         user.profile.phone = phone
-        user.profile.institution = institution  # <-- add this if not already saving institution
+        user.profile.institution = institution
         user.profile.save()
 
         login(request, user)
@@ -98,9 +82,7 @@ def login_view(request):
             if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()}):
                 return redirect(next_url)
             return redirect('home')
-        else:
-            messages.error(request, "Invalid email or password.")
-            return redirect(f"{request.path}?next={next_url}")
+        messages.error(request, "Invalid email or password.")
     return render(request, 'conference/login.html', {'next': next_url})
 
 
@@ -109,22 +91,19 @@ def logout_view(request):
     return redirect('home')
 
 
-
+# ============ ABSTRACT SUBMISSION ============ #
 @login_required
 def abstract_submit(request):
     if request.method == 'POST':
-        print(request.FILES)
         form = AbstractSubmissionForm(request.POST, request.FILES)
         if form.is_valid():
             submission = form.save(commit=False)
-            print("Saved submission:", submission.abstract_file.url)
             submission.user = request.user
             submission.mode_of_participation = request.POST.get('mode_of_participation')
             submission.category = request.POST.get('category')
             submission.email = request.user.email
             submission.main_author = request.user.get_full_name() or request.user.username
 
-            # ✅ Set custom institute if "Other" is selected
             if submission.institute == "Others":
                 custom = form.cleaned_data.get("custom_institute")
                 if custom:
@@ -132,12 +111,12 @@ def abstract_submit(request):
 
             submission.save()
 
-            print("Abstract file URL:", submission.abstract_file.url)
-
-
+            # 🔍 Confirm abstract uploaded
+            if submission.abstract_file:
+                print("✅ Abstract uploaded:", submission.abstract_file.url)
 
             # Save coauthors
-            for i in range(20):  # check first 20 indexes
+            for i in range(20):
                 first = request.POST.get(f'coauthor_first_name_{i}')
                 last = request.POST.get(f'coauthor_last_name_{i}')
                 email = request.POST.get(f'coauthor_email_{i}')
@@ -145,7 +124,6 @@ def abstract_submit(request):
                 custom_affil = request.POST.get(f'coauthor_custom_institute_{i}')
                 designation = request.POST.get(f'coauthor_designation_{i}')
                 category = request.POST.get(f'coauthor_category_{i}')
-
 
                 if first and last and email:
                     affiliation_final = custom_affil.strip() if affil == 'Others' and custom_affil else affil
@@ -170,47 +148,47 @@ Your submission ID is {submission.paper_id}.
 You will receive a notification once it is reviewed.
 
 Regards,
-IBSSC2025 Secretariat""",
+IBSSC2025 Secretariat"",
                 from_email=None,
                 recipient_list=[request.user.email],
             )
             return redirect('thankyouab')
     else:
         form = AbstractSubmissionForm()
-
     return render(request, 'conference/abstract_submit.html', {'form': form})
+
 
 def thank_you_abstract(request):
     return render(request, 'conference/thankyouab.html')
 
 
+# ============ PROFILE & FULL PAPER ============ #
 @login_required
 def profile_view(request):
     submissions = AbstractSubmission.objects.filter(user=request.user)
 
     if request.method == 'POST':
         submission_id = request.POST.get('submission_id')
-        if submission_id:
-            submission = get_object_or_404(AbstractSubmission, id=submission_id, user=request.user)
-            form = FullPaperUploadForm(request.POST, request.FILES, instance=submission)
-            if form.is_valid():
-                form.save()
-                send_mail(
-                    subject="Final Paper Uploaded Successfully – Conf2025",
-                    message=(
-                        f"Dear {request.user.first_name},\n\n"
-                        f"Your final paper for the abstract titled \"{submission.title}\" has been successfully uploaded.\n\n"
-                        "You can now proceed to payment if not already done.\n"
-                        "View your profile here: http://127.0.0.1:8000/profile/\n\n"
-                        "Regards,\nIBSSC2025 Secretariat"
-                    ),
-                    from_email=None,
-                    recipient_list=[request.user.email]
-                )
-                messages.success(request, "Full paper uploaded successfully and email sent.")
-                return redirect('profile')
+        submission = get_object_or_404(AbstractSubmission, id=submission_id, user=request.user)
+        form = FullPaperUploadForm(request.POST, request.FILES, instance=submission)
+        if form.is_valid():
+            form.save()
+            send_mail(
+                subject="Final Paper Uploaded Successfully – Conf2025",
+                message=(
+                    f"Dear {request.user.first_name},\n\n"
+                    f"Your final paper for the abstract titled \"{submission.title}\" has been successfully uploaded.\n\n"
+                    "You can now proceed to payment if not already done.\n"
+                    "View your profile here: http://127.0.0.1:8000/profile/\n\n"
+                    "Regards,\nIBSSC2025 Secretariat"
+                ),
+                from_email=None,
+                recipient_list=[request.user.email]
+            )
+            messages.success(request, "Full paper uploaded successfully and email sent.")
+            return redirect('profile')
         else:
-            messages.error(request, "Invalid submission ID.")
+            messages.error(request, "Invalid submission.")
     else:
         form = FullPaperUploadForm()
 
@@ -220,11 +198,123 @@ def profile_view(request):
     })
 
 
+# ============ PARTICIPATION & PAYMENT ============ #
+@login_required
+def confirm_participation_view(request, paper_id):
+    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
+    coauthors = CoAuthor.objects.filter(submission=submission)
 
-from django.shortcuts import render, get_object_or_404, redirect
-from django.forms import modelformset_factory
-from .models import AbstractSubmission, CoAuthor
-from .forms import AbstractSubmissionForm
+    if request.method == 'POST':
+        author_mode = request.POST.get('author_mode')
+        author_proof = request.FILES.get('author_identity_proof')
+
+        pinfo = ParticipationInfo.objects.create(
+            submission=submission,
+            author_participation_mode=author_mode,
+            author_identity_proof=author_proof,
+        )
+
+        total = calculate_fee(submission.category, author_mode, submission.institute)
+
+        for idx, co in enumerate(coauthors):
+            mode = request.POST.get(f'coauthor_mode_{idx}')
+            proof = request.FILES.get(f'coauthor_proof_{idx}')
+            CoAuthorParticipation.objects.create(
+                participation_info=pinfo,
+                name=f"{co.first_name} {co.last_name}",
+                email=co.email,
+                participation_mode=mode,
+                identity_proof=proof,
+            )
+            total += calculate_fee(co.category, mode, co.affiliation)
+
+        pinfo.total_amount = total
+        pinfo.save()
+        return redirect('payment', paper_id=submission.paper_id)
+
+    return render(request, 'conference/confirm_participation.html', {
+        'submission': submission,
+        'coauthors': coauthors,
+    })
+
+
+@login_required
+def checkout_view(request, paper_id):
+    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
+
+    if submission.payment_status:
+        messages.error(request, "You have already completed payment.")
+        return redirect('payment', paper_id=paper_id)
+
+    try:
+        registration = FinalRegistration.objects.get(submission=submission)
+        participants = registration.participants.all()
+    except FinalRegistration.DoesNotExist:
+        registration = None
+        participants = []
+
+    coauthors = submission.coauthors.all()
+
+    if request.method == 'POST':
+        if registration:
+            registration.participants.all().delete()
+            registration.delete()
+
+        author_mode = request.POST.get('author_mode')
+        author_proof = request.FILES.get('author_identity_proof')
+        total = calculate_fee(submission.category, author_mode, submission.institute)
+
+        registration = FinalRegistration.objects.create(
+            submission=submission,
+            author_mode=author_mode,
+            author_identity_proof=author_proof,
+            total_amount=0
+        )
+
+        for idx, co in enumerate(coauthors):
+            mode = request.POST.get(f'coauthor_mode_{idx}')
+            proof = request.FILES.get(f'coauthor_proof_{idx}')
+            if mode != 'None':
+                FinalParticipant.objects.create(
+                    registration=registration,
+                    name=f"{co.first_name} {co.last_name}",
+                    email=co.email,
+                    affiliation=co.affiliation,
+                    role='CoAuthor',
+                    mode=mode,
+                    identity_proof=proof
+                )
+                total += calculate_fee(co.category, mode, co.affiliation)
+
+        visitor_count = int(request.POST.get('visitor_count', 0))
+        for i in range(visitor_count):
+            name = request.POST.get(f'visitor_name_{i}')
+            email = request.POST.get(f'visitor_email_{i}')
+            affiliation = request.POST.get(f'visitor_affiliation_{i}')
+            mode = request.POST.get(f'visitor_mode_{i}')
+            proof = request.FILES.get(f'visitor_proof_{i}')
+            if name and email and affiliation and mode:
+                FinalParticipant.objects.create(
+                    registration=registration,
+                    name=name,
+                    email=email,
+                    affiliation=affiliation,
+                    role='Visitor',
+                    mode=mode,
+                    identity_proof=proof
+                )
+                total += calculate_fee('NonPresenter', mode, affiliation)
+
+        registration.total_amount = total
+        registration.save()
+        return redirect('payment_summary', paper_id=paper_id)
+
+    return render(request, 'conference/checkout.html', {
+        'submission': submission,
+        'coauthors': coauthors,
+        'registration': registration,
+        'participants': participants,
+    })
 
 
 @login_required
@@ -264,142 +354,11 @@ def payment_summary(request, paper_id):
         'registration': registration,
         'participants': participants,
         'amount': registration.total_amount,
-        'payment_pending': True  # Flag to customize message in template
+        'payment_pending': True
     })
 
 
-@login_required
-def confirm_participation_view(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-    coauthors = CoAuthor.objects.filter(submission=submission)
-
-    if request.method == 'POST':
-        author_mode = request.POST.get('author_mode')
-        author_proof = request.FILES.get('author_identity_proof')
-
-        pinfo = ParticipationInfo.objects.create(
-            submission=submission,
-            author_participation_mode=author_mode,
-            author_identity_proof=author_proof,
-        )
-
-        total = 0
-        if author_mode == 'Offline':
-            total += 16000 - 1000 if 'assam university' in submission.institute.lower() else 16000
-        elif author_mode == 'Online':
-            total += 1000
-
-        for idx, co in enumerate(coauthors):
-            mode = request.POST.get(f'coauthor_mode_{idx}')
-            proof = request.FILES.get(f'coauthor_proof_{idx}')
-            CoAuthorParticipation.objects.create(
-                participation_info=pinfo,
-                name=f"{co.first_name} {co.last_name}",
-                email=co.email,
-                participation_mode=mode,
-                identity_proof=proof,
-            )
-            if mode == 'Offline':
-                total += 16000
-            elif mode == 'Online':
-                total += 1000
-
-        pinfo.total_amount = total
-        pinfo.save()
-        return redirect('payment', paper_id=submission.paper_id)
-
-    return render(request, 'conference/confirm_participation.html', {
-        'submission': submission,
-        'coauthors': coauthors,
-    })
-
-
-@login_required
-def checkout_view(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-
-    if submission.payment_status:
-        messages.error(request, "You have already completed payment.")
-        return redirect('payment', paper_id=paper_id)
-
-    try:
-        registration = FinalRegistration.objects.get(submission=submission)
-        participants = registration.participants.all()
-    except FinalRegistration.DoesNotExist:
-        registration = None
-        participants = []
-
-    coauthors = submission.coauthors.all()
-
-    if request.method == 'POST':
-        if registration:
-            registration.participants.all().delete()
-            registration.delete()
-
-        author_mode = request.POST.get('author_mode')
-        author_proof = request.FILES.get('author_identity_proof')
-
-        # ✅ Correct fee logic using category + mode + institute
-        total = calculate_fee(submission.category, author_mode, submission.institute)
-
-        registration = FinalRegistration.objects.create(
-            submission=submission,
-            author_mode=author_mode,
-            author_identity_proof=author_proof,
-            total_amount=0
-        )
-
-        for idx, co in enumerate(coauthors):
-            mode = request.POST.get(f'coauthor_mode_{idx}')
-            proof = request.FILES.get(f'coauthor_proof_{idx}')
-            if mode != 'None':
-                FinalParticipant.objects.create(
-                    registration=registration,
-                    name=f"{co.first_name} {co.last_name}",
-                    email=co.email,
-                    affiliation=co.affiliation,
-                    role='CoAuthor',
-                    mode=mode,
-                    identity_proof=proof
-                )
-                if mode == 'Offline':
-                    total += 16000 if 'assam university' not in co.affiliation.lower() else 15000
-                elif mode == 'Online':
-                    total += 1000
-
-        visitor_count = int(request.POST.get('visitor_count', 0))
-        for i in range(visitor_count):
-            name = request.POST.get(f'visitor_name_{i}')
-            email = request.POST.get(f'visitor_email_{i}')
-            affiliation = request.POST.get(f'visitor_affiliation_{i}')
-            mode = request.POST.get(f'visitor_mode_{i}')
-            proof = request.FILES.get(f'visitor_proof_{i}')
-            if name and email and affiliation and mode:
-                FinalParticipant.objects.create(
-                    registration=registration,
-                    name=name,
-                    email=email,
-                    affiliation=affiliation,
-                    role='Visitor',
-                    mode=mode,
-                    identity_proof=proof
-                )
-                if mode == 'Offline':
-                    total += 16000 if 'assam university' not in affiliation.lower() else 15000
-                elif mode == 'Online':
-                    total += 1000
-
-        registration.total_amount = total
-        registration.save()
-        return redirect('payment_summary', paper_id=paper_id)
-
-    return render(request, 'conference/checkout.html', {
-        'submission': submission,
-        'coauthors': coauthors,
-        'registration': registration,
-        'participants': participants,
-    })
-
+# ============ STATIC PAGES ============ #
 def thank_you(request):
     return render(request, 'conference/thankyou.html')
 
@@ -411,6 +370,9 @@ def contact(request):
 
 def itinerary(request):
     return render(request, 'conference/itinerary.html')
+
+
+# ============ UTILITY ============ #
 def calculate_fee(category, mode, institute):
     if mode == 'Offline':
         if category == 'Corporate':
@@ -422,18 +384,14 @@ def calculate_fee(category, mode, institute):
         elif category == 'NonPresenter':
             amount = 15000
         elif category == 'International':
-            amount = 20000  # or 250 * exchange_rate if dynamic
+            amount = 20000
         else:
             amount = 16000
 
-        # Assam University discount
         if 'assam university' in institute.lower():
             amount -= 1000
     elif mode == 'Online':
-        if category == 'Corporate':
-            amount = 2000
-        else:
-            amount = 1000
+        amount = 2000 if category == 'Corporate' else 1000
     else:
         amount = 0
     return amount
