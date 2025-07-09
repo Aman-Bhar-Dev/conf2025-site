@@ -132,6 +132,9 @@ def abstract_submit(request):
 
             submission.save()
 
+            print("Abstract file URL:", submission.abstract_file.url)
+
+
 
             # Save coauthors
             for i in range(20):  # check first 20 indexes
