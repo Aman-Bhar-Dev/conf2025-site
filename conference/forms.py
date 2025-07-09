@@ -1,6 +1,34 @@
 from django import forms
-from .models import AbstractSubmission, CoAuthor
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
+from .models import AbstractSubmission, CoAuthor, UserProfile
 
+# ----------- Signup Form (NEW) -----------
+class UserRegisterForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+    phone_number = forms.CharField(max_length=15, required=True)
+    institute = forms.CharField(max_length=255, required=True)
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'institute', 'password1', 'password2']
+
+    def save(self, commit=True):
+        user = super().save(commit)
+        user.email = self.cleaned_data['email']
+        user.first_name = self.cleaned_data['first_name']
+        user.last_name = self.cleaned_data['last_name']
+        if commit:
+            user.save()
+            # Save profile info
+            profile = user.userprofile
+            profile.phone_number = self.cleaned_data['phone_number']
+            profile.institute = self.cleaned_data['institute']
+            profile.save()
+        return user
+
+
+# ----------- Abstract Submission Form -----------
 DESIGNATION_CHOICES = [
     ('Student', 'Student'),
     ('Research Scholar', 'Research Scholar'),
@@ -45,6 +73,7 @@ class AbstractSubmissionForm(forms.ModelForm):
         if institute == 'Others' and not custom_institute:
             self.add_error('custom_institute', "Please enter your institute name.")
 
+# ----------- Full Paper Upload Form -----------
 class FullPaperUploadForm(forms.ModelForm):
     class Meta:
         model = AbstractSubmission
@@ -53,6 +82,7 @@ class FullPaperUploadForm(forms.ModelForm):
             'full_paper': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.pdf'}),
         }
 
+# ----------- Co-Author Form -----------
 class CoAuthorForm(forms.ModelForm):
     designation = forms.ChoiceField(
         choices=[('', '---------')] + DESIGNATION_CHOICES,
