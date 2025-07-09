@@ -97,7 +97,6 @@ from django.core.mail import send_mail
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 
-@login_required
 def abstract_submit(request):
     if request.method == 'POST':
         form = AbstractSubmissionForm(request.POST, request.FILES)
@@ -122,10 +121,11 @@ def abstract_submit(request):
 
             submission.save()
 
-            # Confirm Cloudinary upload
+            # ✅ Confirm file upload and storage backend
             if submission.abstract_file:
                 print("✅ Abstract uploaded successfully.")
                 print("🌐 Abstract file URL after save:", submission.abstract_file.url)
+                print("🛠️ Storage backend used:", submission.abstract_file.storage)
             else:
                 print("❌ Abstract file not saved.")
 
@@ -151,18 +151,19 @@ def abstract_submit(request):
                         category=category or 'Student'
                     )
 
-                    send_mail(
-                        subject="IBSSC 2025 - Abstract Submission Confirmation",
-                        message=f"""Dear {request.user.first_name},
-                    
-                    Thank you for submitting your abstract to IBSSC 2025. Our team will review your submission and notify you of the next steps.
-                    
-                    Regards,  
-                    IBSSC2025 Secretariat
-                    """,
-                        from_email=None,
-                        recipient_list=[request.user.email],
-                    )
+            # ✅ Email confirmation to main author
+            send_mail(
+                subject="IBSSC 2025 - Abstract Submission Confirmation",
+                message=f"""Dear {request.user.first_name},
+
+Thank you for submitting your abstract to IBSSC 2025. Our team will review your submission and notify you of the next steps.
+
+Regards,  
+IBSSC2025 Secretariat
+""",
+                from_email=None,
+                recipient_list=[request.user.email],
+            )
 
             messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
