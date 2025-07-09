@@ -35,6 +35,9 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "conference",
     "import_export",
+    "cloudinary",
+    "cloudinary_storage",
+
 ]
 
 MIDDLEWARE = [
@@ -113,8 +116,6 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "conference/static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
 
 # WhiteNoise configuration for Render static hosting
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -134,3 +135,12 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': config('CLOUDINARY_API_KEY'),
+    'API_SECRET': config('CLOUDINARY_API_SECRET'),
+}
+
