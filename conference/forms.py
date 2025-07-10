@@ -90,6 +90,21 @@ class AbstractSubmissionForm(forms.ModelForm):
                 raise ValidationError("Unsupported file type. Upload PDF or Word document (.pdf, .doc, .docx).")
         return file
 
+class FullPaperUploadForm(forms.ModelForm):
+    class Meta:
+        model = AbstractSubmission
+        fields = ['full_paper']
+        widgets = {
+            'full_paper': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.pdf'}),
+        }
+
+    def clean_full_paper(self):
+        file = self.cleaned_data.get('full_paper')
+        if file and file.content_type != 'application/pdf':
+            raise ValidationError("Only PDF files are allowed for full paper upload.")
+        return file
+
+
 # ----------- Co-Author Form -----------
 class CoAuthorForm(forms.ModelForm):
     designation = forms.ChoiceField(
