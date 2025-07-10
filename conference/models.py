@@ -53,7 +53,14 @@ class AbstractSubmission(models.Model):
     designation = models.CharField(max_length=50, choices=DESIGNATION_CHOICES)
 
     keywords = models.TextField()
-    full_paper = models.FileField(upload_to='papers/', blank=True, null=True)
+    full_paper = models.FileField(
+    upload_to='full_papers/',
+    blank=True,
+    null=True,
+    storage=MediaCloudinaryStorage()
+)
+
+
 
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
@@ -165,7 +172,13 @@ class CoAuthor(models.Model):
 class ParticipationInfo(models.Model):
     submission = models.OneToOneField(AbstractSubmission, on_delete=models.CASCADE)
     author_participation_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    author_identity_proof = models.FileField(upload_to='identity_proofs/', blank=True, null=True)
+    author_identity_proof = models.FileField(
+    upload_to='identity_proofs/',
+    blank=True,
+    null=True,
+    storage=MediaCloudinaryStorage()
+)
+
     total_amount = models.IntegerField(default=0)
     confirmed_on = models.DateTimeField(auto_now_add=True)
 
@@ -186,7 +199,13 @@ class CoAuthorParticipation(models.Model):
         ],
         default='None'
     )
-    identity_proof = models.FileField(upload_to='identity_proofs/', blank=True, null=True)
+    identity_proof = models.FileField(
+    upload_to='identity_proofs/',
+    blank=True,
+    null=True,
+    storage=MediaCloudinaryStorage()
+)
+
 
     def __str__(self):
         return f"{self.name} ({self.participation_mode})"
@@ -207,4 +226,10 @@ class FinalParticipant(models.Model):
     affiliation = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=[('CoAuthor', 'Co-Author'), ('Visitor', 'Visitor')])
     mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    identity_proof = models.FileField(upload_to='identity_proofs/', blank=True, null=True)
+    identity_proof = models.FileField(
+    upload_to='identity_proofs/',
+    blank=True,
+    null=True,
+    storage=MediaCloudinaryStorage()
+)
+
