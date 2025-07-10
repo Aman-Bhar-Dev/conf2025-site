@@ -3,6 +3,9 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import AbstractSubmission, CoAuthor, UserProfile
 
+from django.core.exceptions import ValidationError
+
+
 # ----------- Signup Form (NEW) -----------
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
@@ -58,7 +61,6 @@ class AbstractSubmissionForm(forms.ModelForm):
             'mode_of_participation',
             'category',
         ]
-
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'name': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
@@ -76,14 +78,17 @@ class AbstractSubmissionForm(forms.ModelForm):
         if institute == 'Others' and not custom_institute:
             self.add_error('custom_institute', "Please enter your institute name.")
 
-# ----------- Full Paper Upload Form -----------
-class FullPaperUploadForm(forms.ModelForm):
-    class Meta:
-        model = AbstractSubmission
-        fields = ['full_paper']
-        widgets = {
-            'full_paper': forms.ClearableFileInput(attrs={'class': 'form-control', 'accept': '.pdf'}),
-        }
+    def clean_abstract_file(self):
+        file = self.cleaned_data.get('abstract_file')
+        if file:
+            allowed_types = [
+                'application/pdf',
+                'application/msword',  # .doc
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document'  # .docx
+            ]
+            if file.content_type not in allowed_types:
+                raise ValidationError("Unsupported file type. Upload PDF or Word document (.pdf, .doc, .docx).")
+        return file
 
 # ----------- Co-Author Form -----------
 class CoAuthorForm(forms.ModelForm):
