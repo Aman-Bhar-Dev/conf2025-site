@@ -5,19 +5,16 @@ from django.contrib.auth.models import User
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.contrib import messages
 from django.core.mail import send_mail
-from django.core.exceptions import ValidationError
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse, HttpResponseForbidden, Http404
+from django.http import HttpResponse, HttpResponseForbidden
 import re
 
 from .models import (
-    AbstractSubmission,
-    CoAuthor,
-    FinalRegistration,
-    FinalParticipant,
-    ParticipationInfo,
-    CoAuthorParticipation
+    AbstractSubmission, CoAuthor,
+    FinalRegistration, FinalParticipant,
+    ParticipationInfo, CoAuthorParticipation
 )
+
 from .forms import (
     AbstractSubmissionForm,
     FullPaperUploadForm,
@@ -36,8 +33,7 @@ def signup_view(request):
         phone = request.POST.get('phone')
         institution = request.POST.get('institution')
         if institution == 'Others':
-            custom_institution = request.POST.get('custom_institution')
-            institution = custom_institution.strip() if custom_institution else institution
+            institution = request.POST.get('custom_institution') or institution
 
         password = request.POST.get('password')
         confirm = request.POST.get('confirm-password')
@@ -62,7 +58,7 @@ def signup_view(request):
         )
 
         user.profile.phone = phone
-        user.profile.institution = institution
+        user.profile.institution = institution.strip()
         user.profile.save()
 
         login(request, user)
@@ -92,27 +88,18 @@ def logout_view(request):
 
 
 # ============ ABSTRACT SUBMISSION ============ #
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.shortcuts import redirect, render
-from django.contrib.auth.decorators import login_required
-
+@login_required
 def abstract_submit(request):
     if request.method == 'POST':
         form = AbstractSubmissionForm(request.POST, request.FILES)
-        
-        if form.is_valid():
-            print("✅ Form is valid.")
-            print("📁 Request.FILES:", request.FILES)
 
+        if form.is_valid():
             submission = form.save(commit=False)
             submission.user = request.user
             submission.mode_of_participation = request.POST.get('mode_of_participation')
             submission.category = request.POST.get('category')
             submission.email = request.user.email
             submission.main_author = request.user.get_full_name() or request.user.username
-
-            print("📄 Abstract file before save:", submission.abstract_file)
 
             if submission.institute == "Others":
                 custom = form.cleaned_data.get("custom_institute")
@@ -121,15 +108,6 @@ def abstract_submit(request):
 
             submission.save()
 
-            # ✅ Confirm file upload and storage backend
-            if submission.abstract_file:
-                print("✅ Abstract uploaded successfully.")
-                print("🌐 Abstract file URL after save:", submission.abstract_file.url)
-                print("🛠️ Storage backend used:", submission.abstract_file.storage)
-            else:
-                print("❌ Abstract file not saved.")
-
-            # Save co-authors
             for i in range(20):
                 first = request.POST.get(f'coauthor_first_name_{i}')
                 last = request.POST.get(f'coauthor_last_name_{i}')
@@ -151,7 +129,6 @@ def abstract_submit(request):
                         category=category or 'Student'
                     )
 
-            # ✅ Email confirmation to main author
             send_mail(
                 subject="IBSSC 2025 - Abstract Submission Confirmation",
                 message=f"""Dear {request.user.first_name},
@@ -167,15 +144,14 @@ IBSSC2025 Secretariat
 
             messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
+
         else:
-            print("❌ Form is invalid.")
-            print(form.errors)
+            messages.error(request, "There was an error with your submission.")
 
     else:
         form = AbstractSubmissionForm()
-    
-    return render(request, 'conference/abstract_submit.html', {'form': form})
 
+    return render(request, 'conference/abstract_submit.html', {'form': form})
 
 
 def thank_you_abstract(request):
@@ -195,20 +171,23 @@ def profile_view(request):
             form.save()
             send_mail(
                 subject="Final Paper Uploaded Successfully – Conf2025",
-                message=(
-                    f"Dear {request.user.first_name},\n\n"
-                    f"Your final paper for the abstract titled \"{submission.title}\" has been successfully uploaded.\n\n"
-                    "You can now proceed to payment if not already done.\n"
-                    "View your profile here: http://127.0.0.1:8000/profile/\n\n"
-                    "Regards,\nIBSSC2025 Secretariat"
-                ),
+                message=f'''Dear {request.user.first_name},
+
+Your final paper for the abstract titled "{submission.title}" has been successfully uploaded.
+
+You can now proceed to payment if not already done.
+View your profile here: https://ibsscconf-site.onrender.com/profile/
+
+Regards,  
+IBSSC2025 Secretariat
+''',
                 from_email=None,
                 recipient_list=[request.user.email]
             )
-            messages.success(request, "Full paper uploaded successfully and email sent.")
+            messages.success(request, "Full paper uploaded successfully.")
             return redirect('profile')
         else:
-            messages.error(request, "Invalid submission.")
+            messages.error(request, "Invalid full paper upload.")
     else:
         form = FullPaperUploadForm()
 
@@ -397,9 +376,7 @@ def calculate_fee(category, mode, institute):
     if mode == 'Offline':
         if category == 'Corporate':
             amount = 20000
-        elif category == 'Academician':
-            amount = 16000
-        elif category == 'Student':
+        elif category in ['Academician', 'Student']:
             amount = 16000
         elif category == 'NonPresenter':
             amount = 15000
