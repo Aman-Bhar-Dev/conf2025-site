@@ -1,12 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import AbstractSubmission, CoAuthor, UserProfile
-
 from django.core.exceptions import ValidationError
 
+from .models import AbstractSubmission, CoAuthor, UserProfile
 
-# ----------- Signup Form (NEW) -----------
+# ----------- Signup Form -----------
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(required=True)
     phone_number = forms.CharField(max_length=15, required=True)
@@ -14,24 +13,25 @@ class UserRegisterForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'phone_number', 'institute', 'password1', 'password2']
+        fields = [
+            'username', 'email', 'first_name', 'last_name',
+            'phone_number', 'institute', 'password1', 'password2'
+        ]
 
     def save(self, commit=True):
-        user = super().save(commit)
+        user = super().save(commit=False)
         user.email = self.cleaned_data['email']
         user.first_name = self.cleaned_data['first_name']
         user.last_name = self.cleaned_data['last_name']
         if commit:
             user.save()
-            # Save profile info
             profile = user.userprofile
             profile.phone_number = self.cleaned_data['phone_number']
             profile.institute = self.cleaned_data['institute']
             profile.save()
         return user
 
-
-# ----------- Abstract Submission Form -----------
+# ----------- Designation Choices -----------
 DESIGNATION_CHOICES = [
     ('Student', 'Student'),
     ('Research Scholar', 'Research Scholar'),
@@ -41,6 +41,7 @@ DESIGNATION_CHOICES = [
     ('Corporate', 'Corporate'),
 ]
 
+# ----------- Abstract Submission Form -----------
 class AbstractSubmissionForm(forms.ModelForm):
     designation = forms.ChoiceField(
         choices=[('', '---------')] + DESIGNATION_CHOICES,
@@ -66,15 +67,16 @@ class AbstractSubmissionForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
             'custom_institute': forms.TextInput(attrs={'class': 'form-control'}),
             'keywords': forms.TextInput(attrs={'class': 'form-control', 'required': True}),
-            'abstract_file': forms.ClearableFileInput(attrs={'accept': '.pdf,.doc,.docx'}),
+            'abstract_file': forms.ClearableFileInput(attrs={'accept': '.pdf,.doc,.docx', 'class': 'form-control'}),
             'institute': forms.Select(attrs={'class': 'form-control'}),
+            'mode_of_participation': forms.Select(attrs={'class': 'form-control'}),
+            'category': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def clean(self):
         cleaned_data = super().clean()
         institute = cleaned_data.get('institute')
         custom_institute = cleaned_data.get('custom_institute')
-
         if institute == 'Others' and not custom_institute:
             self.add_error('custom_institute', "Please enter your institute name.")
 
@@ -90,6 +92,7 @@ class AbstractSubmissionForm(forms.ModelForm):
                 raise ValidationError("Unsupported file type. Upload PDF or Word document (.pdf, .doc, .docx).")
         return file
 
+# ----------- Full Paper Upload Form -----------
 class FullPaperUploadForm(forms.ModelForm):
     class Meta:
         model = AbstractSubmission
@@ -103,7 +106,6 @@ class FullPaperUploadForm(forms.ModelForm):
         if file and file.content_type != 'application/pdf':
             raise ValidationError("Only PDF files are allowed for full paper upload.")
         return file
-
 
 # ----------- Co-Author Form -----------
 class CoAuthorForm(forms.ModelForm):
