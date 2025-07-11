@@ -1,4 +1,4 @@
-/* === ABOUT PAGE STYLES === */
+/* === ROOT VARIABLES === */
 :root {
   --primary-color: #a6212a;
   --accent-color: #f4c542;
@@ -8,6 +8,7 @@
   --shadow: rgba(0, 0, 0, 0.05) 0px 4px 12px;
 }
 
+/* === GLOBAL STYLES === */
 body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
@@ -15,7 +16,6 @@ body {
   color: var(--text-color);
   line-height: 1.7;
   overflow-x: hidden;
-  position: relative;
 }
 
 /* === NAVBAR === */
@@ -40,6 +40,16 @@ body {
   color: var(--accent-color);
 }
 
+.menu-toggle {
+  display: none;
+  font-size: 1.8rem;
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* NAV LINKS */
 .nav-links {
   display: flex;
   list-style: none;
@@ -59,12 +69,52 @@ body {
   color: var(--accent-color);
 }
 
+/* === RESPONSIVE NAVIGATION === */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+  }
 
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 1rem;
+    background-color: var(--primary-color);
+    padding: 1rem 0;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+
+
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .nav-links li {
+    padding: 0.5rem 2rem;
+  }
+}
+
+/* === ABOUT PAGE === */
 .about-container {
   max-width: 900px;
   margin: 2rem auto;
   padding: 0 1rem;
-  position: relative;
   z-index: 1;
 }
 
@@ -111,37 +161,9 @@ footer {
   background: #f2e8d5;
   color: #5c3d2e;
   margin-top: 3rem;
-  z-index: 1;
 }
 
-/* === RESPONSIVE === */
-@media (max-width: 768px) {
-  .navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .nav-links {
-    flex-direction: column;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .about-container {
-    padding: 0 1rem;
-  }
-
-  .about-container h2 {
-    font-size: 1.3rem;
-  }
-
-  .about-container p,
-  .about-container li {
-    font-size: 0.95rem;
-  }
-}
-
-/* === BACKGROUND SLIDESHOW === */
+/* === OPTIONAL BACKGROUND SLIDESHOW (faded) === */
 .about-page-bg {
   position: fixed;
   top: 0;
