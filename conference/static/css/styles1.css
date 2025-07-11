@@ -26,13 +26,14 @@ ul {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #0a0a23;
+  background-color: #A6212A;
   color: white;
   padding: 1rem 2rem;
   position: sticky;
   top: 0;
   z-index: 1000;
 }
+
 
 .logo {
   font-size: 1.6rem;
