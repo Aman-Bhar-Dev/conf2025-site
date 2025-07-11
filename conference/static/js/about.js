@@ -1,35 +1,40 @@
-// Wait for DOM to load
-document.addEventListener('DOMContentLoaded', () => {
-  const bgDiv = document.querySelector('.about-page-bg');
+    // Background slideshow
+    document.addEventListener('DOMContentLoaded', () => {
+      const bgDiv = document.querySelector('.about-page-bg');
+      const images = [
+        '/static/images/bhutan1.jpg',
+        '/static/images/bhutan2.jpg',
+        '/static/images/bhutan3.jpg',
+        '/static/images/bhutan4.jpg',
+        '/static/images/bhutan5.jpg'
+      ];
+      let currentIndex = 0;
 
-  // Array of image paths
-  const images = [
-    '/static/images/bhutan1.jpg',
-    '/static/images/bhutan2.jpg',
-    '/static/images/bhutan3.jpg',
-    '/static/images/bhutan4.jpg',
-    '/static/images/bhutan5.jpg'
-  ];
+      images.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
 
-  let currentIndex = 0;
+      function changeBackground() {
+        currentIndex = (currentIndex + 1) % images.length;
+        bgDiv.style.opacity = '0.02';
+        setTimeout(() => {
+          bgDiv.style.backgroundImage = `url('${images[currentIndex]}')`;
+          bgDiv.style.opacity = '0.05';
+        }, 500);
+      }
 
-  // Preload images for smoother transitions
-  images.forEach(src => {
-    const img = new Image();
-    img.src = src;
-  });
+      setInterval(changeBackground, 10000);
+    });
 
-  // Function to change background image with a fade effect
-  function changeBackground() {
-    currentIndex = (currentIndex + 1) % images.length;
-    bgDiv.style.opacity = '0.02';  // briefly fade out
+    // Navbar toggle
+document.addEventListener("DOMContentLoaded", function () {
+  const menuToggle = document.getElementById("menu-toggle");
+  const navLinks = document.getElementById("nav-links");
 
-    setTimeout(() => {
-      bgDiv.style.backgroundImage = `url('${images[currentIndex]}')`;
-      bgDiv.style.opacity = '0.05';  // fade back in
-    }, 500); // match transition duration
+  if (menuToggle && navLinks) {
+    menuToggle.addEventListener("click", function () {
+      navLinks.classList.toggle("active");
+    });
   }
-
-  // Change image every 10 seconds
-  setInterval(changeBackground, 10000);
 });
