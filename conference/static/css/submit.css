@@ -1,44 +1,33 @@
-/* ===== Root Variables ===== */
-:root {
-  --primary-color: #a6212a;
-  --primary-hover: #85191f;
-  --background: url("../images/bhutan-mountains.jpg") no-repeat center center;
-  --background-color: rgba(250, 240, 220, 0.9);
-  --card-bg: rgba(255, 255, 255, 0.9);
-  --text-color: #2a1f14;
-  --border-color: #ccc;
-  --button-bg: #f4c542;
-  --button-text: #000;
-  --form-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
-}
-
-/* ===== Base Reset ===== */
+/* Base Reset */
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: var(--background);
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  background: url("../images/bhutan-mountains2.jpg") no-repeat center center;
   background-size: cover;
   background-attachment: fixed;
-  color: var(--text-color);
-  line-height: 1.6;
-  padding-bottom: 3rem;
+  padding-top: 70px; /* Makes room for fixed navbar */
 }
 
-/* ===== Navbar ===== */
+/* Navbar */
 .navbar {
+  background-color: #a61c24;
+  color: white;
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: var(--primary-color);
-  padding: 1rem 2rem;
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  width: 100%;
   z-index: 1000;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
 .logo {
@@ -48,184 +37,156 @@ body {
 }
 
 .logo span {
-  color: var(--button-bg);
+  color: var(--accent-color);
 }
-
 .nav-links {
   list-style: none;
   display: flex;
-  gap: 1.2rem;
+  gap: 1.5rem;
+  margin: 0;
+  padding-left: 0;
 }
 
 .nav-links a {
-  text-decoration: none;
   color: white;
+  text-decoration: none;
   font-weight: 500;
-  transition: color 0.3s;
 }
 
-.nav-links a:hover,
-.nav-links a.active {
-  color: var(--button-bg);
+.nav-links a.active,
+.nav-links a:hover {
+  color: var(--accent-color);
 }
 
-/* ===== Form Styles ===== */
-.form-wrapper {
-  max-width: 900px;
-  margin: 3rem auto;
-  background: var(--card-bg);
-  padding: 2rem;
-  border-radius: 10px;
-  box-shadow: var(--form-shadow);
-  backdrop-filter: blur(4px);
-}
-
-h2 {
-  text-align: center;
-  margin-bottom: 2rem;
-  color: var(--primary-color);
-}
-
-.submission-form {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-}
-
-.form-card {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
-}
-
-.form-card label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 0.3rem;
-}
-
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="file"],
-select,
-textarea {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid var(--border-color);
-  border-radius: 5px;
-  font-size: 0.95rem;
-}
-
-textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.center {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-}
-
-.add-button,
-.submit-button,
-.reset-button {
-  padding: 0.7rem 1.5rem;
-  background: var(--button-bg);
-  color: var(--button-text);
+.menu-toggle {
+  display: none;
+  background: none;
   border: none;
-  border-radius: 5px;
-  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
   cursor: pointer;
-  margin: 0.5rem;
-  transition: background 0.3s ease;
 }
 
-.add-button:hover,
-.submit-button:hover,
-.reset-button:hover {
-  background: var(--primary-hover);
-  color: #fff;
-}
-
-.co-author-group {
-  border: 1px dashed #ccc;
-  padding: 1rem;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-  position: relative;
-  background: rgba(255,255,255,0.85);
-}
-
-.remove-button {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  background: #ff4d4d;
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
-  font-weight: bold;
-  line-height: 24px;
-  text-align: center;
-}
-
-.remove-button:hover {
-  background: #d40000;
-}
-
-/* Responsive */
+/* Responsive navbar */
 @media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1001;
+  }
+
   .nav-links {
     display: none;
     flex-direction: column;
-    background-color: var(--primary-color);
+    background: var(--primary-color);
     position: absolute;
     top: 64px;
-    right: 2rem;
-    width: auto;
+    left: 0;
+    width: 100%;
     padding: 1rem;
-    border-radius: 5px;
+    box-shadow: var(--shadow);
+    z-index: 1000;
   }
 
   .nav-links.show {
     display: flex;
   }
 
-  .menu-toggle {
-    display: block;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-  }
-
-  .form-wrapper {
-    margin: 1rem;
-    padding: 1.5rem;
-  }
-
-  .add-button,
-  .submit-button,
-  .reset-button {
-    width: 100%;
+  .nav-links li {
+    margin: 0.5rem 0;
   }
 }
-.strength-indicator {
-  font-size: 0.9rem;
-  margin-top: 4px;
+
+/* Form Container */
+.form-wrapper {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background: #ffffffee;
+  border-radius: 8px;
+  box-shadow: 0 0 12px rgba(0,0,0,0.15);
+}
+
+/* Form Sections */
+.form-card {
+  margin-bottom: 2rem;
+}
+
+.form-card label {
   display: block;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
 }
 
-.strength-weak { color: red; }
-.strength-medium { color: orange; }
-.strength-strong { color: green; }
+.form-card input,
+.form-card select {
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+/* Buttons */
+button.submit-button {
+  background-color: #a61c24;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button.submit-button:hover {
+  background-color: #8d161e;
+}
+
+button.add-button {
+  background-color: #2196f3;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  margin-top: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button.add-button:hover {
+  background-color: #1976d2;
+}
+
+/* Co-author box */
+.co-author-group {
+  background: #fff9f9;
+  border: 1px dashed #ccc;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  position: relative;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Remove button */
+.remove-button {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+}
