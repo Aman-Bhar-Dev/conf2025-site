@@ -9,16 +9,25 @@
   <script defer src="{% static 'js/itenary.js' %}"></script>
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo">Conf<span>2025</span></div>
-    <ul class="nav-links">
-      <li><a href="{% url 'home' %}">Home</a></li>
-      <li><a href="{%url 'itinerary'%}" class=active>Itinerary</a></li>
-      <li><a href="{% url 'about' %}">About</a></li>
-      <li><a href="{% url 'submit' %}">Submit</a></li>
-      <li><a href="{% url 'contact' %}" >Contact</a></li>
-    </ul>
-  </header>
+    <header class="navbar">
+      <div class="logo">IBSSC<span>2025</span></div>
+      <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="{% url 'home' %}">Home</a></li>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+        <li><a href="{%url 'itinerary'%}" class="active">Itinerary</a></li>
+        <li><a href="{% url 'submit' %}">Submit</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'profile' %}">My Profile</a></li>
+          <li><a href="{% url 'logout' %}">Logout</a></li>
+        {% else %}
+          <li><a href="{% url 'signup' %}">Register</a></li>
+          <li><a href="{% url 'login' %}">Login</a></li>
+        {% endif %}
+      </ul>
+    </header>
+
 
   <header class="hero">
     <div class="overlay"></div>
@@ -42,7 +51,7 @@
     <div class="container">
       <h2>Journey Highlights</h2>
       <div class="image-grid">
-        <div class="card"><img src="{% static 'images/new_cooch_behar.jpg' %}" alt="New Cooch Behar"><p>New Cooch Behar (Start Point)</p></div>
+        <div class="card"><img src="{% static 'images/alipur.jpg' %}" alt="New Cooch Behar"><p>New AlipurDuar (WB) (Start Point)</p></div>
         <div class="card"><img src="{% static 'images/indo-bhutan-border.jpg' %}" alt="Indo-Bhutan Border"><p>Indo-Bhutan Border</p></div>
         <div class="card"><img src="{% static 'images/thimphu.jpg' %}" alt="Thimphu"><p>Thimphu</p></div>
       </div>
@@ -52,7 +61,7 @@
   <section class="sightseeing">
     <div class="container">
       <h2>Free Sightseeing Tour</h2>
-      <p>All registered participants will be treated to a curated sightseeing experience in Bhutan. Here are some of the  places you’ll visit:</p>
+      <p>All registered participants will be treated to a curated sightseeing experience in Bhutan. Here are some of the tentative places you’ll visit:</p>
       <div class="sight-grid">
         <div class="sight-card"><img src="{% static 'images/taktsang.jpg' %}" alt="Tiger's Nest Monastery"><p>Tiger’s Nest Monastery</p></div>
         <div class="sight-card"><img src="{% static 'images/memorial-chorten.jpg' %}" alt="Memorial Chorten"><p>Memorial Chorten, Thimphu</p></div>
