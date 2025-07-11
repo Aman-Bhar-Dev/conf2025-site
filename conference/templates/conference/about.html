@@ -14,11 +14,17 @@
 
   <!-- Navigation Bar -->
   <header class="navbar">
-    <div class="logo">IBSSC<span>2025</span></div>
+    <div class="logo">
+      <a href="{% url 'home' %}">IBSSC<span>2025</span></a>
+    </div>
     <ul class="nav-links">
       <li><a href="{% url 'home' %}">Home</a></li>
       <li><a href="{% url 'about' %}" class="active">About</a></li>
-      <li><a href="{% url 'submit' %}">Submit</a></li>
+      <li><a href="{% url 'cfp' %}">Call for Papers</a></li>
+      <li><a href="{% url 'committee' %}">Committee</a></li>
+      <li><a href="{% url 'dates' %}">Important Dates</a></li>
+      <li><a href="{% url 'registration' %}">Registration</a></li>
+      <li><a href="{% url 'contact' %}">Contact</a></li>
     </ul>
   </header>
 
@@ -62,6 +68,7 @@
       <h3>Members of Organising Committee</h3>
       <ul>
         <li>Prof. A L Ghosh</li>
+        <li>Prof. A Barman</li>
         <li>Dr. Joyeeta Deb</li>
         <li>Dr. Juthika Konwar</li>
         <li>Dr. Habib Laskar</li>
