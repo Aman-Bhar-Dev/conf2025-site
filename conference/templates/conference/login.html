@@ -10,25 +10,34 @@
 </head>
 <body>
   <!-- Navbar -->
-  <header class="navbar">
-    <div class="nav-logo">Conf<span>2025</span></div>
-    <input type="checkbox" id="nav-toggle" class="nav-toggle" />
-    <nav>
-      <ul class="nav-links" id="nav-links">
-        <li><a href="{% url 'home' %}">Home</a></li>
-        <li><a href="{% url 'submit' %}">Submit</a></li>
+<header class="navbar">
+  <div class="nav-logo">Conf<span>2025</span></div>
 
-        {% if user.is_authenticated %}
-          <li><span class="welcome-text">Welcome, {{ user.first_name }}</span></li>
-          <li><a href="{% url 'logout' %}">Logout</a></li>
-        {% else %}
-          <li><a href="{% url 'signup' %}">Register</a></li>
-          <li><a href="{% url 'login' %}" class="active">Login</a></li>
-        {% endif %}
-      </ul>
-    </nav>
-    <label for="nav-toggle" class="nav-toggle-label"><span></span></label>
-  </header>
+  <!-- Hamburger Toggle Button -->
+  <button id="hamburger" class="hamburger" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'contact' %}">Contact</a></li>
+      <li><a href="{% url 'itinerary' %}">Itinerary</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      {% if user.is_authenticated %}
+        <li><span class="welcome-text">Welcome, {{ user.first_name }}</span></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'signup' %}">Register</a></li>
+        <li><a href="{% url 'login' %}" class="active">Login</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>
+
 
   <!-- Login Form -->
   <main class="login-container">
