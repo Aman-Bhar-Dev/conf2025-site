@@ -8,15 +8,25 @@
   <link rel="stylesheet" href="{% static 'css/contact.css' %}">
 </head>
 <body>
-  <header class="navbar">
-    <div class="logo">Conf<span>2025</span></div>
-    <ul class="nav-links">
-      <li><a href="{% url 'home' %}">Home</a></li>
-      <li><a href="{% url 'about' %}">About</a></li>
-      <li><a href="{% url 'submit' %}">Submit</a></li>
-      <li><a href="{% url 'contact' %}" class="active">Contact</a></li>
-    </ul>
-  </header>
+<header class="navbar">
+  <div class="logo">Conf<span>2025</span></div>
+  <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+  <ul class="nav-links" id="nav-links">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'about' %}">About</a></li>
+    <li><a href="{% url 'contact' %}" class="active">Contact</a></li>
+    <li><a href="{% url 'itinerary' %}">Itinerary</a></li>
+    <li><a href="{% url 'submit' %}">Submit</a></li>
+    {% if user.is_authenticated %}
+      <li><a href="{% url 'profile' %}">My Profile</a></li>
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+    {% else %}
+      <li><a href="{% url 'signup' %}">Register</a></li>
+      <li><a href="{% url 'login' %}">Login</a></li>
+    {% endif %}
+  </ul>
+</header>
+
 
   <main class="contact-container">
     <h2>Contact Information</h2>
@@ -69,5 +79,6 @@
   <footer>
     <p>© 2025 Assam University Silchar | Conf2025</p>
   </footer>
+  <script src="{% static 'js/contact.js' %}"></script>
 </body>
 </html>
