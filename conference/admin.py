@@ -154,18 +154,26 @@ class AbstractSubmissionAdmin(ExportMixin, admin.ModelAdmin):
     # Email notifications
     def send_approval_email(self, obj):
         send_mail(
-            subject="Abstract Approved – Conf2025",
+            subject="Abstract Approved – IBSSC 2025",
             message=(
-                f"Dear {obj.user.first_name},\n\n"
-                f"Your abstract titled \"{obj.title}\" has been APPROVED.\n"
-                "You can now upload your final paper and proceed to payment.\n"
-                "Login to your profile here: http://127.0.0.1:8000/profile/\n\n"
-                "Regards,\nConf2025 Secretariat"
+                f"Dear {obj.user.username},\n\n"
+                f"It gives us immense pleasure to inform you that the Research Paper Scrutiny Committee has accepted "
+                f"the abstract of your research paper with ID {obj.paper_id}, entitled “{obj.title}”, to be presented in the "
+                f"“Indo Bhutan Social Science Conference” organised by the Department of Business Administration, Assam University, "
+                f"to be held at Royal Thimphu College, Bhutan, from 3rd September 2025 to 6th September 2025.\n\n"
+                f"You are further requested to submit the full-length paper and complete the registration process on or before "
+                f"10th August 2025.\n\n"
+                f"Note: If there are multiple authors in the paper, each author must register individually to receive a certificate.\n\n"
+                f"👉 Join our official WhatsApp group to receive important conference updates:\n"
+                f"https://chat.whatsapp.com/CPEaa6ek2ur0q6vL7nHJGT\n\n"
+                f"Regards,\n"
+                f"IBSSC Secretariat"
             ),
-            from_email=None,
+            from_email=None,  # Uses settings.DEFAULT_FROM_EMAIL
             recipient_list=[obj.user.email],
             fail_silently=False,
         )
+
 
     def send_rejection_email(self, obj):
         send_mail(
