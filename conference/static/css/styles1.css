@@ -1,4 +1,4 @@
-
+/* Reset & Base Styles */
 * {
   margin: 0;
   padding: 0;
@@ -21,11 +21,52 @@ ul {
   list-style: none;
 }
 
-/* Container */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #0a0a23;
+  color: white;
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  font-family: 'Merriweather', serif;
+}
+
+.logo span {
+  color: #ffcc00;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  list-style: none;
+}
+
+.nav-links li a {
+  color: white;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-links li a:hover {
+  color: #ffcc00;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: white;
+  cursor: pointer;
 }
 
 /* Hero Section */
@@ -63,7 +104,6 @@ ul {
   color: #fff;
 }
 
-/* Hero Headings & Subtext */
 .hero h1 {
   font-size: 3rem;
   font-weight: 800;
@@ -137,34 +177,15 @@ ul {
   background-color: #e6b800;
 }
 
-/* Section Titles */
-.section-title {
-  text-align: center;
-  font-size: 2.2rem;
-  margin: 3rem 0 1.5rem;
-  color: #333;
-  position: relative;
+.btn.outline {
+  background-color: transparent;
+  border: 2px solid #ffcc00;
+  color: #ffcc00;
 }
 
-.section-title::after {
-  content: '';
-  display: block;
-  width: 60px;
-  height: 4px;
+.btn.outline:hover {
   background-color: #ffcc00;
-  margin: 0.5rem auto 0;
-}
-
-/* About Section */
-.about {
-  padding: 4rem 2rem;
-  background-color: #fff;
-  text-align: justify;
-}
-
-.about p {
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
+  color: #000;
 }
 
 /* Countdown */
@@ -197,8 +218,64 @@ ul {
   margin-top: 0.5rem;
 }
 
-/* Responsive */
+.countdown-label {
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #ffffffee;
+}
+
+/* Floating Theme Toggle Button */
+.floating-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #0a0a23;
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 0.6rem 0.8rem;
+  font-size: 1.2rem;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  transition: background 0.3s;
+}
+
+.floating-toggle:hover {
+  background-color: #ffcc00;
+  color: #000;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background-color: #0a0a23;
+  color: white;
+  font-size: 0.9rem;
+}
+
+/* Responsive Nav Menu */
 @media (max-width: 768px) {
+  .nav-links {
+    flex-direction: column;
+    display: none;
+    width: 100%;
+    background-color: #0a0a23;
+    position: absolute;
+    top: 70px;
+    left: 0;
+    padding: 1rem 2rem;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
   .hero h1 {
     font-size: 2.2rem;
   }
