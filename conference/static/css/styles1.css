@@ -59,8 +59,9 @@ body {
   font-weight: 500;
 }
 
+.nav-links a.active,
 .nav-links a:hover {
-  text-decoration: underline;
+  color: var(--accent-color);
 }
 
 /* HERO */
