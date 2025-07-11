@@ -1,177 +1,164 @@
-/* Reset & Base */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* === ITINERARY PAGE STYLES (THEME-CONSISTENT) === */
+:root {
+  --primary-color: #a6212a;
+  --accent-color: #f4c542;
+  --bg-color: #faf0dc;
+  --text-color: #222;
+  --section-bg: #fff;
+  --footer-color: #5c3d2e;
+  --shadow: rgba(0, 0, 0, 0.05) 0px 4px 12px;
 }
 
 body {
+  margin: 0;
   font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f9ff;
-  color: #1a1a1a;
-  line-height: 1.6;
+  background: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.7;
 }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-ul {
-  list-style: none;
-}
-
-/* Navbar */
 .navbar {
-  background-color: #ffffff;
+  background: var(--primary-color);
+  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 15px 40px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 1000;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 1.4rem;
   font-weight: bold;
-  color: #004080;
+  color: #fff;
 }
 
 .logo span {
-  color: #0096c7;
+  color: var(--accent-color);
 }
 
 .nav-links {
+  list-style: none;
   display: flex;
-  gap: 30px;
+  gap: 1.5rem;
+  margin: 0;
+  padding-left: 0;
 }
 
-.nav-links li a {
-  color: #004080;
+.nav-links a {
+  color: white;
+  text-decoration: none;
   font-weight: 500;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: all 0.3s ease;
 }
 
-.nav-links li a:hover,
-.nav-links li a.active {
-  background-color: #e6f4ff;
-  color: #0096c7;
+.nav-links a.active,
+.nav-links a:hover {
+  color: var(--accent-color);
 }
 
-/* Hero Section */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  color: white;
+  cursor: pointer;
+}
+
+/* Responsive navbar */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1001;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background: var(--primary-color);
+    position: absolute;
+    top: 64px;
+    left: 0;
+    width: 100%;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+  }
+
+  .nav-links.show {
+    display: flex;
+  }
+
+  .nav-links li {
+    margin: 0.5rem 0;
+  }
+}
+
+/* === PAGE-SPECIFIC STYLES === */
 .hero {
   position: relative;
-  height: 50vh;
   background: url('../images/bhutan-mountains.jpg') no-repeat center center/cover;
+  height: 300px;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   color: white;
   text-align: center;
 }
 
 .hero .overlay {
   position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.45);
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 .hero-content {
+  position: relative;
   z-index: 1;
-  max-width: 700px;
-  padding: 20px;
-}
-
-.hero h1 {
-  font-size: 3rem;
-  margin-bottom: 10px;
-}
-
-.hero p {
-  font-size: 1.2rem;
-}
-
-/* Section Styles */
-section {
-  padding: 60px 20px;
 }
 
 .container {
-  max-width: 1200px;
-  margin: auto;
+  max-width: 1000px;
+  margin: 2rem auto;
+  padding: 0 1rem;
 }
 
 h2 {
-  font-size: 2rem;
-  margin-bottom: 20px;
-  color: #004080;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
 }
 
-.intro p,
-.sightseeing p {
-  font-size: 1.1rem;
-  color: #333;
-}
-
-/* Image Grids */
-.image-grid,
-.sight-grid {
+.image-grid, .sight-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 25px;
-  margin-top: 30px;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin-top: 1rem;
 }
 
-.card,
-.sight-card {
-  background: #fff;
-  border-radius: 12px;
+.card, .sight-card {
+  background: white;
+  border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: var(--shadow);
+  text-align: center;
 }
 
-.card:hover,
-.sight-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-}
-
-.card img,
-.sight-card img {
+.card img, .sight-card img {
   width: 100%;
   height: 180px;
   object-fit: cover;
 }
 
-.card p,
-.sight-card p {
-  padding: 10px;
+.card p, .sight-card p {
+  padding: 0.5rem;
+  color: var(--primary-color);
   font-weight: 600;
-  text-align: center;
-  color: #004080;
-}
-
-/* Responsive Typography */
-@media (max-width: 768px) {
-  .hero h1 {
-    font-size: 2.2rem;
-  }
-
-  .hero p {
-    font-size: 1rem;
-  }
-
-  .nav-links {
-    gap: 15px;
-  }
-
-  h2 {
-    font-size: 1.6rem;
-  }
 }
