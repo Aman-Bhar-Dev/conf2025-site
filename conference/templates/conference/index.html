@@ -4,15 +4,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Conference 2025 | Assam University</title>
-  <link rel="stylesheet" href="{% static 'css/styles1.css' %}">
+  <title>IBSSC 2025 | Assam University Silchar</title>
+  <meta name="description" content="Official website of the Indo-Bhutan Social Science Conference 2025, hosted by Assam University Silchar in collaboration with Royal Thimphu College, Bhutan.">
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&display=swap" rel="stylesheet">
+  <link rel="icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
 </head>
 <body>
 
-<nav class="navbar">
+<nav class="navbar" role="navigation" aria-label="Main Navigation">
   <div class="logo">IBSSC<span>2025</span></div>
-  <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+  <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">&#9776;</button>
   <ul class="nav-links" id="nav-links">
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
@@ -29,21 +31,32 @@
   </ul>
 </nav>
 
-<main class="hero">
+<main class="hero" role="main">
   <div class="overlay"></div>
   <div class="hero-content">
-    <h1>INDO-BHUTAN SOCIAL SCIENCE  CONFERENCE</h1>
-    <p>Department of Business Administration,<br>Assam University Silchar</p>
-    <p class="collab">In academic partnership with</p>
-    <p> Royal Thimpu College<br>Bhutan</p>
-    <p class="date">03 -06 September, 2025</p>
+    <h1>INDO-BHUTAN SOCIAL SCIENCE CONFERENCE</h1>
 
-    <div class="countdown" id="countdown">
+    <p class="dept">
+      <strong>Department of Business Administration,</strong><br>
+      <strong>Assam University Silchar</strong>
+    </p>
+
+    <p class="collab-heading">In Academic Partnership With</p>
+    <p class="partner">
+      <strong>Royal Thimphu College</strong><br>
+      <strong>Bhutan</strong>
+    </p>
+
+    <p class="venue-highlight pulse">📍 <strong>Venue: Royal Thimphu College, Bhutan</strong></p>
+
+    <p class="date">03 - 06 September, 2025</p>
+
+    <div class="countdown" id="countdown" aria-label="Countdown Timer">
       <div><span id="days">00</span><small>Days</small></div>
       <div><span id="hours">00</span><small>Hours</small></div>
       <div><span id="minutes">00</span><small>Minutes</small></div>
     </div>
-    <p class="countdown-label">Till the abstract submission closes </p>
+    <p class="countdown-label">Till the abstract submission closes</p>
 
     <div class="cta-buttons">
       {% if user.is_authenticated %}
@@ -56,9 +69,12 @@
   </div>
 </main>
 
-<footer>© 2025 Assam University Silchar | All Rights Reserved</footer>
 
-<button class="floating-toggle" id="theme-toggle" title="Toggle Theme">🌙</button>
+<footer>
+  © 2025 Assam University Silchar | All Rights Reserved
+</footer>
+
+<button class="floating-toggle" id="theme-toggle" title="Toggle Theme" aria-label="Toggle dark/light theme">🌙</button>
 <script src="{% static 'js/script.js' %}"></script>
 </body>
 </html>
