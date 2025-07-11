@@ -28,25 +28,21 @@ function removeCoAuthor(button) {
   group.remove();
 }
 
-// Show/hide custom institute input
-document.addEventListener("DOMContentLoaded", () => {
-  const select = document.getElementById("institute-select");
-  const customWrapper = document.getElementById("custom-institute-wrapper");
+document.addEventListener('DOMContentLoaded', () => {
+  const menuToggle = document.getElementById('menu-toggle');
+  const navLinks = document.getElementById('nav-links');
 
-  select.addEventListener("change", function () {
-    customWrapper.classList.toggle("hidden", this.value !== "Other");
+  menuToggle.addEventListener('click', () => {
+    navLinks.classList.toggle('show');
+    menuToggle.innerHTML = navLinks.classList.contains('show') ? '&times;' : '&#9776;';
   });
 
-  // Hamburger toggle
-  const hamburger = document.getElementById("hamburger");
-  const navLinks = document.getElementById("nav-links");
-
-  hamburger.addEventListener("click", () => {
-    navLinks.classList.toggle("show");
+  // Optional: auto-close menu on link click
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navLinks.classList.remove('show');
+      menuToggle.innerHTML = '&#9776;';
+    });
   });
 });
-setTimeout(function () {
-    document.querySelectorAll('.alert').forEach(function (el) {
-      el.style.display = 'none';
-    });
-}, 5000); // hide after 5 seconds
+
