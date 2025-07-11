@@ -33,3 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Change image every 10 seconds
   setInterval(changeBackground, 10000);
 });
+  document.addEventListener("DOMContentLoaded", function () {
+    const menuToggle = document.getElementById("menu-toggle");
+    const navLinks = document.getElementById("nav-links");
+
+    menuToggle.addEventListener("click", function () {
+      navLinks.classList.toggle("active");
+    });
+  });
