@@ -394,4 +394,4 @@ def calculate_fee(category, mode, institute):
     return amount
 
 def pricing_view(request):
-    return render(request, 'pricing.html')
+    return render(request, 'conference/pricing.html')
