@@ -31,4 +31,5 @@ urlpatterns = [
     path('confirm-participation/<str:paper_id>/', views.confirm_participation_view, name='confirm_participation'),
     path('checkout/<str:paper_id>/', views.checkout_view, name='checkout'),
     path('payment-summary/<str:paper_id>/', views.payment_summary, name='payment_summary'),
+    path('pricing/', views.pricing_view, name='pricing'),
 ]
