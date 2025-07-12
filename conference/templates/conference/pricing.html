@@ -1,0 +1,116 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Conference Registration | IBSSC 2025</title>
+  <link rel="stylesheet" href="{% static 'css/pricing.css' %}">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="logo">IBSSC<span>2025</span></div>
+    <button class="menu-toggle" id="menu-toggle">&#9776;</button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'contact' %}">Contact</a></li>
+      <li><a href="{% url 'itinerary' %}">Itinerary</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      {% if user.is_authenticated %}
+        <li><a href="{% url 'profile' %}">My Profile</a></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'signup' %}">Register</a></li>
+        <li><a href="{% url 'login' %}">Login</a></li>
+      {% endif %}
+    </ul>
+  </header>
+
+  <!-- Pricing Section -->
+  <div class="container">
+    <h1>Registration Fee (Offline Mode & Online Mode)</h1>
+
+    <div class="toggle-section">
+      <button class="mode-btn active" onclick="switchMode('offline')">Offline</button>
+      <button class="mode-btn" onclick="switchMode('online')">Online</button>
+    </div>
+
+    <!-- Offline Pricing -->
+    <div class="pricing-table" id="offline">
+      <div class="pricing-card"><h3>Academicians</h3><p>Rs. 16,000 <span class="note">*</span></p></div>
+      <div class="pricing-card"><h3>Corporate Participants</h3><p>Rs. 20,000</p></div>
+      <div class="pricing-card"><h3>Research Scholars & Students</h3><p>Rs. 16,000 <span class="note">*</span></p></div>
+      <div class="pricing-card"><h3>Non-Presenter Participants</h3><p>Rs. 15,000</p></div>
+      <div class="pricing-card"><h3>Foreign Participants<br><small>(Except India & Bhutan)</small></h3><p>$250 (in INR)</p></div>
+      <div class="pricing-note">
+        <p><strong>Discount:</strong> Assam University Academicians and Research Scholars/Students may avail a discount of ₹1,000 on the Offline Registration Fee of ₹16,000.</p>
+      </div>
+    </div>
+
+    <!-- Online Pricing -->
+    <div class="pricing-table hidden" id="online">
+      <div class="pricing-card"><h3>Academicians</h3><p>Rs. 1,000</p></div>
+      <div class="pricing-card"><h3>Corporate Participants</h3><p>Rs. 2,000</p></div>
+      <div class="pricing-card"><h3>Research Scholars & Students</h3><p>Rs. 1,000</p></div>
+      <div class="pricing-card"><h3>Non-Presenter Participants</h3><p>Rs. 1,000</p></div>
+      <div class="pricing-card"><h3>Foreign Participants<br><small>(Except India & Bhutan)</small></h3><p>$100 (in INR)</p></div>
+    </div>
+
+    <!-- Notes -->
+    <div class="notes">
+      <h3>Note:</h3>
+      <ul>
+        <li>Offline registration includes conference participation, travel from New AlipurDuar (WB), accommodation, meals, sightseeing, and conference kit.</li>
+        <li>If total offline participants are less than 50, Bhutan SDF entry charges apply. Otherwise, waived.</li>
+        <li>Non-presenter attendees must register separately (₹15,000 or $250).</li>
+        <li>Co-authors must register for a certificate (₹1,000). If traveling offline, full ₹16,000 applies.</li>
+        <li>Offline mode: One registration covers 3 papers max. Online mode: Each paper needs a separate ₹1,000 registration.</li>
+      </ul>
+
+      <h3>Date of Journey:</h3>
+      <p>
+        <strong>2nd September 2025, 6 AM:</strong> Departure from New AlipurDuar (WB)<br>
+        <strong>6th September 2025, evening:</strong> Return<br>
+        (Guided by Dr. Lhato Jamba, Local Organising Secretary)
+      </p>
+
+      <div class="important-dates">
+        <h3>Important Dates:</h3>
+        <p><strong>Abstract Submission:</strong> July 30, 2025</p>
+        <p><strong>Full Paper Submission:</strong> August 10, 2025</p>
+        <p><strong>Registration Deadline:</strong> August 10, 2025</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    // Navbar toggle for mobile
+    const toggleBtn = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+    toggleBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('show');
+    });
+
+    // Switch pricing modes
+    function switchMode(mode) {
+      const online = document.getElementById('online');
+      const offline = document.getElementById('offline');
+      const buttons = document.querySelectorAll('.mode-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      if (mode === 'online') {
+        online.classList.remove('hidden');
+        offline.classList.add('hidden');
+        buttons[1].classList.add('active');
+      } else {
+        offline.classList.remove('hidden');
+        online.classList.add('hidden');
+        buttons[0].classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
