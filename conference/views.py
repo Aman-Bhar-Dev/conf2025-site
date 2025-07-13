@@ -105,6 +105,15 @@ def abstract_submit(request):
                 custom = form.cleaned_data.get("custom_institute")
                 if custom:
                     submission.institute = custom.strip()
+            uploaded_file = request.FILES.get('abstract_file')
+            if uploaded_file:
+                result = cloudinary.uploader.upload(
+                    uploaded_file,
+                    resource_type='raw',
+                    folder='abstracts/',
+                    public_id=os.path.splitext(uploaded_file.name)[0]
+                )
+                submission.abstract_file.name = result['public_id']
 
             submission.save()
 
