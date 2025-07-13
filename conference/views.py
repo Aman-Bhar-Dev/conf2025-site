@@ -116,22 +116,19 @@ def abstract_submit(request):
             submission.email = request.user.email
             submission.main_author = request.user.get_full_name() or request.user.username
 
-            # Handle "Others" for main author's institute
+            # Custom institute logic
             if submission.institute == "Others":
                 custom = form.cleaned_data.get("custom_institute")
                 if custom:
                     submission.institute = custom.strip()
 
-            # Upload abstract file to Cloudinary
+            # Use built-in Django file saving (Cloudinary will handle it)
             uploaded_file = request.FILES.get('abstract_file')
             if uploaded_file and uploaded_file.size > 0:
-                result = cloudinary.uploader.upload(
-                    uploaded_file,
-                    resource_type='raw',
-                    folder='abstracts/',
-                    public_id=os.path.splitext(uploaded_file.name)[0]
-                )
-                submission.abstract_file.name = result['secure_url']
+                submission.abstract_file = uploaded_file
+            else:
+                messages.error(request, "Uploaded file is empty.")
+                return render(request, 'conference/abstract_submit.html', {'form': form})
 
             submission.save()
 
@@ -157,7 +154,7 @@ def abstract_submit(request):
                         category=category or 'Student'
                     )
 
-            # Send confirmation email
+            # Confirmation email
             send_mail(
                 subject="IBSSC 2025 - Abstract Submission Confirmation",
                 message=f"""Dear {request.user.first_name},
@@ -173,8 +170,10 @@ IBSSC2025 Secretariat
 
             messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
+
         else:
             messages.error(request, "There was an error with your submission.")
+
     else:
         form = AbstractSubmissionForm()
 
