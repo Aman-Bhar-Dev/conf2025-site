@@ -8,6 +8,9 @@ from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseForbidden
 import re
+import cloudinary
+import cloudinary.uploader
+
 
 from .models import (
     AbstractSubmission, CoAuthor,
