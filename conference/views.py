@@ -10,6 +10,7 @@ from django.http import HttpResponse, HttpResponseForbidden
 import re
 import cloudinary
 import cloudinary.uploader
+import os
 
 
 from .models import (
