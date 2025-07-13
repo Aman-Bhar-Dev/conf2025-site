@@ -92,6 +92,17 @@ def logout_view(request):
 
 
 # ============ ABSTRACT SUBMISSION ============ #
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.core.mail import send_mail
+import cloudinary.uploader
+import os
+
+from .forms import AbstractSubmissionForm
+from .models import AbstractSubmission, CoAuthor
+
+
 @login_required
 def abstract_submit(request):
     if request.method == 'POST':
@@ -105,22 +116,26 @@ def abstract_submit(request):
             submission.email = request.user.email
             submission.main_author = request.user.get_full_name() or request.user.username
 
+            # Handle "Others" for main author's institute
             if submission.institute == "Others":
                 custom = form.cleaned_data.get("custom_institute")
                 if custom:
                     submission.institute = custom.strip()
+
+            # Upload abstract file to Cloudinary
             uploaded_file = request.FILES.get('abstract_file')
-            if uploaded_file:
+            if uploaded_file and uploaded_file.size > 0:
                 result = cloudinary.uploader.upload(
                     uploaded_file,
                     resource_type='raw',
                     folder='abstracts/',
                     public_id=os.path.splitext(uploaded_file.name)[0]
                 )
-                submission.abstract_file.name = result['public_id']
+                submission.abstract_file.name = result['secure_url']
 
             submission.save()
 
+            # Save co-authors
             for i in range(20):
                 first = request.POST.get(f'coauthor_first_name_{i}')
                 last = request.POST.get(f'coauthor_last_name_{i}')
@@ -142,6 +157,7 @@ def abstract_submit(request):
                         category=category or 'Student'
                     )
 
+            # Send confirmation email
             send_mail(
                 subject="IBSSC 2025 - Abstract Submission Confirmation",
                 message=f"""Dear {request.user.first_name},
@@ -157,14 +173,13 @@ IBSSC2025 Secretariat
 
             messages.success(request, "Abstract submitted successfully.")
             return redirect('thankyouab')
-
         else:
             messages.error(request, "There was an error with your submission.")
-
     else:
         form = AbstractSubmissionForm()
 
     return render(request, 'conference/abstract_submit.html', {'form': form})
+
 
 
 def thank_you_abstract(request):
