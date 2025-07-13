@@ -2,7 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from cloudinary_storage.storage import MediaCloudinaryStorage
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
+
 
 # -------------------------------
 # USER PROFILE (for phone & institute)
@@ -27,7 +28,7 @@ def create_user_profile(sender, instance, created, **kwargs):
 class AbstractSubmission(models.Model):
     main_author = models.CharField(max_length=255)
     email = models.EmailField()
-    abstract_file = models.FileField(upload_to='abstracts/', storage=MediaCloudinaryStorage())
+    abstract_file = models.FileField(upload_to='abstracts/', storage=RawMediaCloudinaryStorage())
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     paper_id = models.CharField(max_length=15, unique=True, editable=False, blank=True)
@@ -54,13 +55,11 @@ class AbstractSubmission(models.Model):
 
     keywords = models.TextField()
     full_paper = models.FileField(
-    upload_to='full_papers/',
-    blank=True,
-    null=True,
-    storage=MediaCloudinaryStorage()
-)
-
-
+        upload_to='full_papers/',
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage()
+    )
 
     STATUS_CHOICES = [
         ('PENDING', 'Pending'),
@@ -173,12 +172,11 @@ class ParticipationInfo(models.Model):
     submission = models.OneToOneField(AbstractSubmission, on_delete=models.CASCADE)
     author_participation_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
     author_identity_proof = models.FileField(
-    upload_to='identity_proofs/',
-    blank=True,
-    null=True,
-    storage=MediaCloudinaryStorage()
-)
-
+        upload_to='identity_proofs/',
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage()
+    )
     total_amount = models.IntegerField(default=0)
     confirmed_on = models.DateTimeField(auto_now_add=True)
 
@@ -200,12 +198,11 @@ class CoAuthorParticipation(models.Model):
         default='None'
     )
     identity_proof = models.FileField(
-    upload_to='identity_proofs/',
-    blank=True,
-    null=True,
-    storage=MediaCloudinaryStorage()
-)
-
+        upload_to='identity_proofs/',
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage()
+    )
 
     def __str__(self):
         return f"{self.name} ({self.participation_mode})"
@@ -214,7 +211,10 @@ class CoAuthorParticipation(models.Model):
 class FinalRegistration(models.Model):
     submission = models.OneToOneField(AbstractSubmission, on_delete=models.CASCADE)
     author_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    author_identity_proof = models.FileField(upload_to='identity_proofs/')
+    author_identity_proof = models.FileField(
+        upload_to='identity_proofs/',
+        storage=RawMediaCloudinaryStorage()
+    )
     total_amount = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -227,9 +227,8 @@ class FinalParticipant(models.Model):
     role = models.CharField(max_length=20, choices=[('CoAuthor', 'Co-Author'), ('Visitor', 'Visitor')])
     mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
     identity_proof = models.FileField(
-    upload_to='identity_proofs/',
-    blank=True,
-    null=True,
-    storage=MediaCloudinaryStorage()
-)
-
+        upload_to='identity_proofs/',
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage()
+    )
