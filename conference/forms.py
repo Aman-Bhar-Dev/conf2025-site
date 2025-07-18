@@ -123,3 +123,26 @@ class CoAuthorForm(forms.ModelForm):
             'last_name': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
         }
+from .models import FinalRegistration
+
+class PaymentConfirmationForm(forms.ModelForm):
+    transaction_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+        required=True
+    )
+    transaction_time = forms.TimeField(
+        widget=forms.TimeInput(attrs={'type': 'time', 'class': 'form-control'}),
+        required=True
+    )
+    transaction_id = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'form-control'}),
+        required=True
+    )
+    payment_screenshot = forms.ImageField(
+        required=True,
+        widget=forms.ClearableFileInput(attrs={'class': 'form-control'})
+    )
+
+    class Meta:
+        model = FinalRegistration
+        fields = ['transaction_id', 'transaction_date', 'transaction_time', 'payment_screenshot']
