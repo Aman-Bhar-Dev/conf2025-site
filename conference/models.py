@@ -168,67 +168,67 @@ class CoAuthor(models.Model):
         ordering = ['last_name', 'first_name']
 
 
-class ParticipationInfo(models.Model):
-    submission = models.OneToOneField(AbstractSubmission, on_delete=models.CASCADE)
-    author_participation_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    author_identity_proof = models.FileField(
-        upload_to='identity_proofs/',
-        blank=True,
-        null=True,
-        storage=RawMediaCloudinaryStorage()
-    )
-    total_amount = models.IntegerField(default=0)
-    confirmed_on = models.DateTimeField(auto_now_add=True)
+#----- Payment related --------#
 
-    def __str__(self):
-        return f"ParticipationInfo for {self.submission.paper_id}"
-
-
-class CoAuthorParticipation(models.Model):
-    participation_info = models.ForeignKey(ParticipationInfo, on_delete=models.CASCADE, related_name='coauthor_details')
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-    participation_mode = models.CharField(
-        max_length=10,
-        choices=[
-            ('None', 'Not Attending'),
-            ('Online', 'Online'),
-            ('Offline', 'Offline')
-        ],
-        default='None'
-    )
-    identity_proof = models.FileField(
-        upload_to='identity_proofs/',
-        blank=True,
-        null=True,
-        storage=RawMediaCloudinaryStorage()
-    )
-
-    def __str__(self):
-        return f"{self.name} ({self.participation_mode})"
-
+from django.db import models
+from .models import AbstractSubmission  # adjust if needed
+from cloudinary_storage.storage import RawMediaCloudinaryStorage
 
 class FinalRegistration(models.Model):
+
+    THEME_CHOICES = [
+        ('Society, Equity, Transformation & Social Work', 'Society, Equity, Transformation & Social Work'),
+        ('Knowledge, Education & Human Development', 'Knowledge, Education & Human Development'),
+        ('Politics, Governance, Public Policy, and Political Science', 'Politics, Governance, Public Policy, and Political Science'),
+        ('Economy, Technology & Social Impact', 'Economy, Technology & Social Impact'),
+        ('Culture, Identity & Globalization', 'Culture, Identity & Globalization'),
+        ('Environment, Climate & Sustainability', 'Environment, Climate & Sustainability'),
+        ('Business, Commerce and Business Sustainability', 'Business, Commerce and Business Sustainability'),
+        ('General Social Science and Topics Not Falling Under the Above Categories', 'General Social Science and Topics Not Falling Under the Above Categories'),
+    ]
+
     submission = models.OneToOneField(AbstractSubmission, on_delete=models.CASCADE)
+    author_name = models.CharField(max_length=255)
+    author_designation = models.CharField(max_length=100)
+    author_contact = models.CharField(max_length=20)
+    author_gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
+    author_address = models.TextField()
     author_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    author_identity_proof = models.FileField(
-        upload_to='identity_proofs/',
-        storage=RawMediaCloudinaryStorage()
-    )
-    total_amount = models.IntegerField()
+    author_id_proof = models.FileField(upload_to='id_proofs/')
+    total_amount = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    presenter_name = models.CharField(max_length=255, blank=True, null=True)
+    fee_breakdown = models.TextField(blank=True)
+    transaction_date = models.DateField(blank=True, null=True)
+    transaction_time = models.TimeField(blank=True, null=True)
+    transaction_id = models.CharField(max_length=100, blank=True, null=True)
+    selected_theme = models.CharField(
+        max_length=200,
+        choices=THEME_CHOICES,
+        blank=True,
+        null=True
+    )
+    payment_verified = models.BooleanField(default=False)
+
+
+    # 🔽 New fields
+    payment_screenshot = models.ImageField(upload_to='payment_screenshots/', blank=True, null=True, storage=RawMediaCloudinaryStorage())
+    payment_verified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.submission.paper_id} - Final Registration"
 
 
 class FinalParticipant(models.Model):
     registration = models.ForeignKey(FinalRegistration, on_delete=models.CASCADE, related_name='participants')
     name = models.CharField(max_length=255)
-    email = models.EmailField()
-    affiliation = models.CharField(max_length=255)
+    email = models.EmailField(blank=True, null=True)  # Email for co-authors only
+    contact = models.CharField(max_length=20)
+    gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
+    address = models.TextField()
     role = models.CharField(max_length=20, choices=[('CoAuthor', 'Co-Author'), ('Visitor', 'Visitor')])
     mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    identity_proof = models.FileField(
-        upload_to='identity_proofs/',
-        blank=True,
-        null=True,
-        storage=RawMediaCloudinaryStorage()
-    )
+    id_proof = models.FileField(upload_to='id_proofs/', blank=True, null=True)
+    affiliation = models.CharField(max_length=255, blank=True, null=True)
+    def __str__(self):
+        return f"{self.name} ({self.role})"
