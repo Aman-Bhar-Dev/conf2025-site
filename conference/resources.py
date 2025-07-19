@@ -73,3 +73,59 @@ class AbstractSubmissionResource(resources.ModelResource):
     def dehydrate_coauthor5_email(self, obj): return obj.get_coauthor5_email()
     def dehydrate_coauthor5_designation(self, obj): return obj.get_coauthor5_designation()
     def dehydrate_coauthor5_affiliation(self, obj): return obj.get_coauthor5_affiliation()
+# conference/resources.py
+from import_export import resources, fields
+from .models import FinalRegistration, FinalParticipant
+
+class FinalRegistrationResource(resources.ModelResource):
+    paper_id          = fields.Field(column_name='Paper ID', attribute='submission__paper_id')
+    main_author_name  = fields.Field(column_name='Main Author', attribute='author_name')
+    main_author_email = fields.Field(column_name='Main Author Email',
+                                     attribute='submission__user__email')
+    main_author_institute = fields.Field(column_name='Main Author Institute',
+                                         attribute='submission__institute')
+    main_author_designation = fields.Field(column_name='Main Author Designation',
+                                           attribute='author_designation')
+    author_contact    = fields.Field(column_name='Author Contact', attribute='author_contact')
+    author_address    = fields.Field(column_name='Author Address', attribute='author_address')
+    author_gender     = fields.Field(column_name='Author Gender', attribute='author_gender')
+    author_mode       = fields.Field(column_name='Author Mode', attribute='author_mode')
+
+    coauthors = fields.Field(column_name='Co-Authors')
+    visitors  = fields.Field(column_name='Visitors')
+    title = fields.Field(column_name='Title', attribute='submission__title')
+    selected_theme = fields.Field(column_name='Selected Theme', attribute='selected_theme')
+
+
+    total_amount      = fields.Field(column_name='Total Amount', attribute='total_amount')
+
+    class Meta:
+        model = FinalRegistration
+        fields = (
+        'paper_id',
+        'title',
+        'selected_theme',
+        'main_author_name', 'main_author_email', 'main_author_institute',
+        'main_author_designation', 'author_contact','author_address',
+        'author_gender','author_mode',
+        'coauthors','visitors',
+        'total_amount',
+        )
+
+        export_order = fields
+
+    def dehydrate_coauthors(self, reg):
+        parts = []
+        for p in reg.participants.filter(role='CoAuthor'):
+            parts.append(
+              f"{p.name} ({p.email}, {p.contact}, {p.mode})"
+            )
+        return "; ".join(parts) or "—"
+
+    def dehydrate_visitors(self, reg):
+        parts = []
+        for p in reg.participants.filter(role='Visitor'):
+            parts.append(
+              f"{p.name} ({p.email or 'N/A'}, {p.contact}, {p.mode})"
+            )
+        return "; ".join(parts) or "—"
