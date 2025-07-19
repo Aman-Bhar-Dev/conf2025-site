@@ -1,1 +1,6 @@
-.settings.py
+# Ignore all migration files
+conference/migrations/
+
+# But allow actual migration scripts (not pyc)
+!conference/migrations/*.py
+!conference/migrations/__init__.py

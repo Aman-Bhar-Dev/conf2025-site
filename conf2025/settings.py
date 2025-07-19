@@ -163,3 +163,7 @@ CLOUDINARY_STORAGE = {
     'RESOURCE_TYPE': 'raw',
     
 }
+import django
+django.setup()
+from django.core.management import call_command
+call_command('migrate')
