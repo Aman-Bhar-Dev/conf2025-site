@@ -7,7 +7,7 @@ from django.urls import path
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.html import format_html
 from django.contrib import messages
-
+from .resources import FinalRegistrationResource
 from import_export.admin import ExportMixin
 
 from .models import UserProfile, AbstractSubmission, CoAuthor
@@ -43,7 +43,9 @@ class FullPaperUploadForm(forms.ModelForm):
         model = AbstractSubmission
         fields = ['full_paper']
 
-
+from django.template.loader import render_to_string
+from django.core.mail import EmailMessage
+from .models import CoAuthor
 @admin.register(AbstractSubmission)
 class AbstractSubmissionAdmin(ExportMixin, admin.ModelAdmin):
     form = FullPaperUploadForm
@@ -153,27 +155,26 @@ class AbstractSubmissionAdmin(ExportMixin, admin.ModelAdmin):
 
     # Email notifications
     def send_approval_email(self, obj):
-        send_mail(
-            subject="Abstract Approved – IBSSC 2025",
-            message=(
-                f"Dear {obj.user.username},\n\n"
-                f"It gives us immense pleasure to inform you that the Research Paper Scrutiny Committee has accepted "
-                f"the abstract of your research paper with ID {obj.paper_id}, entitled “{obj.title}”, to be presented in the "
-                f"“Indo Bhutan Social Science Conference” organised by the Department of Business Administration, Assam University, "
-                f"to be held at Royal Thimphu College, Bhutan, from 3rd September 2025 to 6th September 2025.\n\n"
-                f"You are further requested to submit the full-length paper and complete the registration process on or before "
-                f"10th August 2025.\n\n"
-                f"Note: If there are multiple authors in the paper, each author must register individually to receive a certificate.\n\n"
-                f"👉 Join our official WhatsApp group to receive important conference updates:\n"
-                f"https://chat.whatsapp.com/CPEaa6ek2ur0q6vL7nHJGT\n\n"
-                f"Regards,\n"
-                f"IBSSC Secretariat"
-            ),
-            from_email=None,  # Uses settings.DEFAULT_FROM_EMAIL
-            recipient_list=[obj.user.email],
-            fail_silently=False,
-        )
+        user = obj.user
+        coauthors = CoAuthor.objects.filter(submission=obj)
 
+        context = {
+            'author_name': user.get_full_name() or user.username,
+            'title': obj.title,
+            'paper_id': obj.paper_id,
+            'affiliation': obj.institute,
+            'coauthors': coauthors
+        }
+
+        html_content = render_to_string('conference/abstract_approved.html', context)
+
+        email = EmailMessage(
+            subject="Abstract Approved – IBSSC 2025",
+            body=html_content,
+            to=[user.email]
+        )
+        email.content_subtype = "html"
+        email.send()
 
     def send_rejection_email(self, obj):
         send_mail(
@@ -188,3 +189,94 @@ class AbstractSubmissionAdmin(ExportMixin, admin.ModelAdmin):
             recipient_list=[obj.user.email],
             fail_silently=False,
         )
+
+
+
+from django.contrib import admin
+from import_export.admin import ExportMixin
+from django.utils.html import format_html
+from .models import FinalRegistration, FinalParticipant
+from .resources import FinalRegistrationResource
+
+
+class FinalParticipantInline(admin.TabularInline):
+    model = FinalParticipant
+    extra = 0
+    readonly_fields = (
+        'name', 'email', 'contact', 'gender', 'address',
+        'role', 'mode', 'affiliation'
+    )
+    can_delete = False
+    show_change_link = False
+
+
+# ---------- FinalRegistration Admin Setup ----------
+
+# conference/admin.py
+
+from django.contrib import admin
+from import_export.admin import ExportMixin
+from django.utils.html import format_html
+
+from .models import FinalRegistration, FinalParticipant
+from .resources import FinalRegistrationResource
+from .views import send_payment_receipt_email  # your email‑sender
+
+class FinalParticipantInline(admin.TabularInline):
+    model = FinalParticipant
+    readonly_fields = (
+        'name','email','contact','gender','address','role','mode','affiliation'
+    )
+    extra = 0
+    can_delete = False
+    show_change_link = False
+
+@admin.action(description="✅ Mark as payment verified & send receipt email")
+def mark_payment_verified(modeladmin, request, queryset):
+    sent = 0
+    for reg in queryset:
+        if not reg.payment_verified:
+            reg.payment_verified = True
+            reg.save()
+            send_payment_receipt_email(reg)
+            sent += 1
+    modeladmin.message_user(request, f"{sent} receipt email(s) sent.")
+
+@admin.register(FinalRegistration)
+class FinalRegistrationAdmin(ExportMixin, admin.ModelAdmin):
+    resource_class = FinalRegistrationResource
+    inlines       = [FinalParticipantInline]
+    list_display  = (
+        'submission','author_name','author_mode',
+        'total_amount','payment_verified','screenshot_preview'
+    )
+    list_filter   = ('author_mode','payment_verified')
+    search_fields = (
+        'submission__paper_id','submission__title',
+        'submission__user__email',
+    )
+    actions = [mark_payment_verified]
+
+    def author_name(self, obj):
+        return obj.submission.user.get_full_name()
+
+    def screenshot_preview(self, obj):
+        if obj.payment_screenshot:
+            return format_html(
+                '<a href="{0}" target="_blank">'
+                '<img src="{0}" style="max-height:100px;"/></a>',
+                obj.payment_screenshot.url
+            )
+        return 'No screenshot'
+    screenshot_preview.short_description = 'Screenshot'
+
+    def save_model(self, request, obj, form, change):
+        """
+        When saving from the detail page, if payment_verified was just checked,
+        send the receipt email.
+        """
+        # Only on edits, and only if the field actually changed to True
+        if change and 'payment_verified' in form.changed_data and obj.payment_verified:
+            send_payment_receipt_email(obj)
+
+        super().save_model(request, obj, form, change)
