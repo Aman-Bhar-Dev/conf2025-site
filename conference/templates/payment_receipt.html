@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Confirmation - IBSSC 2025</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; padding: 20px; }
+    .container { background: #fff; padding: 30px; border-radius: 8px; max-width: 700px; margin: auto; }
+    .header { text-align: center; color: #0066cc; }
+    .info p { margin: 8px 0; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #eee; }
+    .footer { margin-top: 30px; font-size: 12px; color: #777; text-align: center; }
+    .note { margin-top: 20px; font-size: 10px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="header">Payment Confirmation – IBSSC 2025</h2>
+    <p>Dear {{ name }},</p>
+
+    <h4>Registration Details</h4>
+    <div class="info">
+      <p><strong>Paper ID:</strong> {{ paper_id }}</p>
+      <p><strong>Title:</strong> {{ paper_title }}</p>
+      <p><strong>Theme:</strong> {{ theme }}</p>
+      <p><strong>Institute:</strong> {{ affiliation }}</p>
+      <p><strong>Transaction ID:</strong> {{ transaction_id }}</p>
+      <p><strong>Date:</strong> {{ transaction_date }}</p>
+    </div>
+
+    <h4>Co‑Authors</h4>
+    {% if coauthors %}
+    <ul>
+      {% for c in coauthors %}
+      <li>{{ c.name }} — {{ c.affiliation }}</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No co‑authors.</p>
+    {% endif %}
+
+    <h4>Visitors</h4>
+    {% if visitors %}
+    <ul>
+      {% for v in visitors %}
+      <li>{{ v.name }} (Contact: {{ v.contact }})</li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p>No visitors.</p>
+    {% endif %}
+
+    <h4>Payment Breakdown</h4>
+    <table>
+      <thead>
+        <tr>
+          <th>Role</th>
+          <th>Name</th>
+          <th>Fee (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in breakdown %}
+        <tr>
+          <td>{{ item.role }}</td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.fee }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Total</th>
+          <th>₹{{ total_amount }}</th>
+        </tr>
+      </tfoot>
+    </table>
+
+    <p>Thank you for registering. We look forward to seeing you at IBSSC 2025!</p>
+
+    <div class="note">
+      <p><em>This is a computer‑generated receipt and requires no signature.</em></p>
+    </div>
+      <div class="note">
+      <p><em>registration fees once paid is not refundable.</em></p>
+    </div>
+
+    <div class="footer">
+      IBSSC 2025 Organizing Team<br>
+      Assam University, Silchar
+    </div>
+  </div>
+</body>
+</html>
