@@ -1,6 +1,6 @@
-# Ignore everything in the migrations folder
+# Ignore everything in migrations folder
 conference/migrations/*
-# But do NOT ignore the .py migration files
+# But NOT the Python migration files
 !conference/migrations/*.py
-# Also do NOT ignore the folder itself (needed for exceptions to work)
-!conference/migrations/
+# Ignore __pycache__ folders
+conference/migrations/__pycache__/
