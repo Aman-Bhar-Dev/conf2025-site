@@ -14,6 +14,7 @@ import cloudinary
 import cloudinary.uploader
 import cloudinary.api
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = True
@@ -55,6 +56,8 @@ INSTALLED_APPS = [
     "import_export",
     "cloudinary",
     "cloudinary_storage",
+    'django.contrib.humanize',
+
 
 ]
 
