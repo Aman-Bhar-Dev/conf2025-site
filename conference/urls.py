@@ -25,11 +25,13 @@ urlpatterns = [
     path('about/', views.about, name='about'),
     path('contact/', views.contact, name='contact'),
     path('itinerary/', views.itinerary, name='itinerary'),
-
-    # Payment & Participation
-    path('payment/<str:paper_id>/', views.payment_view, name='payment'),
-    path('confirm-participation/<str:paper_id>/', views.confirm_participation_view, name='confirm_participation'),
-    path('checkout/<str:paper_id>/', views.checkout_view, name='checkout'),
-    path('payment-summary/<str:paper_id>/', views.payment_summary, name='payment_summary'),
     path('pricing/', views.pricing_view, name='pricing'),
+
+    #payment
+    path('checkout/<str:paper_id>/', views.checkout_view, name='checkout'),
+    path('payment-summary/<str:paper_id>/', views.payment_summary_view, name='payment_summary'),
+    path('payment/thank-you/', views.payment_confirmation_view, name='thank_you'),
+
+
+
 ]
