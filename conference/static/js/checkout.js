@@ -1,92 +1,172 @@
-let visitorCount = 0;
+document.addEventListener("DOMContentLoaded", function () {
+  const form = document.getElementById("checkout-form");
+  const visitorsContainer = document.getElementById("visitors-container");
+  const addVisitorBtn = document.getElementById("add-visitor");
+  const summaryContainer = document.getElementById("payment-summary");
+  let visitorCount = 0;
 
-function addVisitor() {
-  const section = document.getElementById('visitor-section');
-  const div = document.createElement('div');
-  div.className = 'visitor-block';
-  div.setAttribute('data-index', visitorCount);
+function getFee(category, mode, institute) {
+  if (!mode) return 0;
 
-  div.innerHTML = `
-    <button type="button" class="remove-button" onclick="removeVisitor(this)">×</button>
+  // Visitor flat fee
+  if (category === "NonPresenter") return 15000;
 
-    <label>Visitor Name</label>
-    <input type="text" name="visitor_name_${visitorCount}" required>
+  // International
+  if (category === "International") return mode === "Offline" ? 20750 : 8300;
 
-    <label>Email</label>
-    <input type="email" name="visitor_email_${visitorCount}" required>
+  // Corporate
+  if (category === "Corporate") return mode === "Offline" ? 20000 : 2000;
 
-    <label>Mode of Attendance</label>
-    <select name="visitor_mode_${visitorCount}" required onchange="updateTotal()">
-      <option value="Offline">Offline</option>
-      <option value="Online">Online</option>
-    </select>
-
-    <label>Upload Identity Proof</label>
-    <input type="file" name="visitor_proof_${visitorCount}" accept=".pdf,.png,.jpg,.jpeg">
-    <hr>
-  `;
-
-  section.appendChild(div);
-  visitorCount++;
-  document.getElementById('visitor-count').value = visitorCount;
-  updateTotal();
-}
-
-function removeVisitor(button) {
-  const block = button.closest('.visitor-block');
-  if (block) {
-    block.remove();
-    updateTotal();
-  }
-}
-
-function isDiscountEligible(affiliation) {
-  return affiliation.toLowerCase().includes("assam university");
-}
-
-function updateTotal() {
-  let total = 0;
-
-  const authorMode = document.querySelector('select[name="author_mode"]')?.value;
-  const mainInstitute = document.querySelector('input[name="institute_name"]')?.value?.toLowerCase() || '';
-  const category = document.getElementById("category-value")?.value?.toLowerCase() || '';
-
-  // Author fee
-  if (authorMode === 'Offline') {
-    if (category === 'corporate') {
-      total += isDiscountEligible(mainInstitute) ? 19000 : 20000;
-    } else {
-      total += isDiscountEligible(mainInstitute) ? 15000 : 16000;
+  // Academician / Student
+  if (["Academician", "Student"].includes(category)) {
+    const inst = (institute || "").toLowerCase().trim();
+    if (mode === "Offline") {
+      return inst.includes("assam university") ? 15000 : 16000;
+    } else if (mode === "Online") {
+      return 1000;
     }
-  } else if (authorMode === 'Online') {
-    total += category === 'corporate' ? 2000 : 1000;
   }
 
-  // Co-authors
-  const coauthorSelects = document.querySelectorAll('[name^="coauthor_mode_"]');
-  coauthorSelects.forEach((select, index) => {
-    const affiliationField = document.querySelector(`[name="coauthor_affiliation_${index}"]`);
-    const affiliation = affiliationField?.value?.toLowerCase() || '';
+  return 0;
+}
 
-    if (select.value === 'Offline') {
-      if (category === 'corporate') {
-        total += isDiscountEligible(affiliation) ? 19000 : 20000;
-      } else {
-        total += isDiscountEligible(affiliation) ? 15000 : 16000;
+
+  function toggleProofVisibility() {
+    // Main Author
+    const authorSelect = form.querySelector("select[name='author_mode']");
+    const authorProofWrapper = form.querySelector("input[name='author_identity_proof']")?.closest(".proof-wrapper");
+    if (authorProofWrapper && authorSelect) {
+      authorProofWrapper.style.display = authorSelect.value === "Offline" ? "block" : "none";
+    }
+
+    // Co-authors
+    document.querySelectorAll("[id^='coauthor-block-']").forEach((block, i) => {
+      const select = block.querySelector(`select[name='coauthor_mode_${i}']`);
+      const proofInput = block.querySelector(`input[name='coauthor_proof_${i}']`);
+      const proofWrapper = proofInput?.closest(".proof-wrapper");
+      if (proofWrapper && select) {
+        proofWrapper.style.display = select.value === "Offline" ? "block" : "none";
       }
-    } else if (select.value === 'Online') {
-      total += category === 'corporate' ? 2000 : 1000;
+    });
+
+    // Visitors
+    visitorsContainer.querySelectorAll(".visitor-block").forEach(block => {
+      const select = block.querySelector("select[name^='visitor_mode_']");
+      const proofWrapper = block.querySelector(".proof-wrapper");
+      if (proofWrapper && select) {
+        proofWrapper.style.display = select.value === "Offline" ? "block" : "none";
+      }
+    });
+  }
+
+  function calculateTotalFee() {
+    let total = 0;
+    let breakdown = [];
+
+    // Main Author
+    const authorModeField = form.querySelector("select[name='author_mode']");
+    const authorMode = authorModeField?.value || "";
+    const authorCategory = authorModeField?.dataset.category || "Student";
+    const authorInstitute = authorModeField?.dataset.institute || "";
+    const authorFee = getFee(authorCategory, authorMode, authorInstitute);
+    total += authorFee;
+    if (authorMode) {
+      breakdown.push(`Main Author: ₹${authorFee.toLocaleString("en-IN")}`);
     }
+
+    // Co-authors
+    document.querySelectorAll("[id^='coauthor-block-']").forEach((block, i) => {
+      const modeField = block.querySelector(`select[name='coauthor_mode_${i}']`);
+      const mode = modeField?.value || "";
+      const category = modeField?.getAttribute("data-category") || "Student";
+      const institute = modeField?.getAttribute("data-institute") || "";
+      const fee = getFee(category, mode, institute);
+      total += fee;
+      if (mode) {
+        breakdown.push(`Co-author ${i + 1}: ₹${fee.toLocaleString("en-IN")}`);
+      }
+    });
+
+    // Visitors
+    const visitors = visitorsContainer.querySelectorAll(".visitor-block");
+    visitors.forEach((block, i) => {
+      const fee = 15000;
+      total += fee;
+      breakdown.push(`Visitor ${i + 1}: ₹${fee.toLocaleString("en-IN")}`);
+    });
+
+    // Update totals
+    document.getElementById("total-amount").innerText = total.toLocaleString("en-IN");
+
+    if (summaryContainer) {
+      summaryContainer.innerHTML = "<h3>Payment Summary</h3><ul>" +
+        breakdown.map(line => `<li>${line}</li>`).join("") +
+        `</ul><p><strong>Total Payable:</strong> ₹${total.toLocaleString("en-IN")}</p>`;
+    }
+  }
+
+  form.addEventListener("change", () => {
+    toggleProofVisibility();
+    calculateTotalFee();
   });
 
-  // Visitors
-  for (let i = 0; i < visitorCount; i++) {
-    const mode = document.querySelector(`select[name="visitor_mode_${i}"]`);
-    if (mode) {
-      if (mode.value === 'Offline') total += 16000;
-      else if (mode.value === 'Online') total += 1000;
-    }
-  }
+  addVisitorBtn.addEventListener("click", () => {
+    const visitorDiv = document.createElement("div");
+    visitorDiv.className = "visitor-block";
+    visitorDiv.innerHTML = `
+      <hr>
+      <label>Visitor Name:</label>
+      <input type="text" name="visitor_name_${visitorCount}" required>
 
-  document.getElementById('total-amount').innerText = total;
-}
+      <label>Email:</label>
+      <input type="email" name="visitor_email_${visitorCount}" required>
+
+      <label>Phone:</label>
+      <input type="text" name="visitor_phone_${visitorCount}" required>
+
+      <label>Address:</label>
+      <textarea name="visitor_address_${visitorCount}" required></textarea>
+
+      <label>Gender:</label>
+      <select name="visitor_gender_${visitorCount}" required>
+        <option value="">-- Select --</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+
+      <label>Mode of Participation:</label>
+      <select name="visitor_mode_${visitorCount}" required>
+        <option value="">-- Select --</option>
+        <option value="Offline">Offline</option>
+        <option value="Online">Online</option>
+      </select>
+
+      <div class="proof-wrapper">
+        <label>Upload Identity Proof:</label>
+        <input type="file" name="visitor_proof_${visitorCount}" accept=".pdf,.jpg,.jpeg,.png">
+      </div>
+
+      <button type="button" class="remove-visitor">Remove</button>
+    `;
+
+    visitorsContainer.appendChild(visitorDiv);
+
+    visitorDiv.querySelector(".remove-visitor").addEventListener("click", () => {
+      visitorsContainer.removeChild(visitorDiv);
+      calculateTotalFee();
+    });
+
+    visitorDiv.querySelector(`select[name="visitor_mode_${visitorCount}"]`).addEventListener("change", () => {
+      toggleProofVisibility();
+      calculateTotalFee();
+    });
+
+    visitorCount++;
+    toggleProofVisibility();
+    calculateTotalFee();
+  });
+
+  toggleProofVisibility();
+  calculateTotalFee();
+});
