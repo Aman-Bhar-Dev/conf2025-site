@@ -83,13 +83,20 @@
                     </form>
                   {% endif %}
                   <div style="margin-top: 1rem;">
-                    {% if submission.payment_status %}
-                      <span class="pay-button disabled" style="background: #ccc; cursor: not-allowed;">✅ Payment Completed</span>
-                    {% else %}
-                      <a href="{% url 'payment' submission.paper_id %}" class="pay-button">Make Payment</a>
-                    {% endif %}
+                    {# 1) never checked out -> Make Payment #}
+                    {% if not submission.finalregistration %}
+                      <a href="{% url 'checkout' submission.paper_id %}" class="pay-button">Make Payment</a>
 
+                    {# 2) checked out but not yet verified -> Under Approval #}
+                    {% elif not submission.finalregistration.payment_verified %}
+                      <span class="pay-button disabled under-approval">⏳ Under Approval</span>
+
+                    {# 3) verified -> Payment Approved #}
+                    {% else %}
+                      <span class="pay-button disabled approved">✅ Payment Approved</span>
+                    {% endif %}
                   </div>
+
                 </div>
               {% endif %}
             </td>
