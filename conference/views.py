@@ -16,7 +16,6 @@ import os
 from .models import (
     AbstractSubmission, CoAuthor,
     FinalRegistration, FinalParticipant,
-    ParticipationInfo, CoAuthorParticipation
 )
 
 from .forms import (
@@ -202,7 +201,6 @@ def profile_view(request):
 
 Your final paper for the abstract titled "{submission.title}" has been successfully uploaded.
 
-You can now proceed to payment if not already done.
 View your profile here: https://ibsscconf-site.onrender.com/profile/
 
 Regards,  
@@ -223,167 +221,6 @@ IBSSC2025 Secretariat
         'upload_form': form
     })
 
-
-# ============ PARTICIPATION & PAYMENT ============ #
-@login_required
-def confirm_participation_view(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-    coauthors = CoAuthor.objects.filter(submission=submission)
-
-    if request.method == 'POST':
-        author_mode = request.POST.get('author_mode')
-        author_proof = request.FILES.get('author_identity_proof')
-
-        pinfo = ParticipationInfo.objects.create(
-            submission=submission,
-            author_participation_mode=author_mode,
-            author_identity_proof=author_proof,
-        )
-
-        total = calculate_fee(submission.category, author_mode, submission.institute)
-
-        for idx, co in enumerate(coauthors):
-            mode = request.POST.get(f'coauthor_mode_{idx}')
-            proof = request.FILES.get(f'coauthor_proof_{idx}')
-            CoAuthorParticipation.objects.create(
-                participation_info=pinfo,
-                name=f"{co.first_name} {co.last_name}",
-                email=co.email,
-                participation_mode=mode,
-                identity_proof=proof,
-            )
-            total += calculate_fee(co.category, mode, co.affiliation)
-
-        pinfo.total_amount = total
-        pinfo.save()
-        return redirect('payment', paper_id=submission.paper_id)
-
-    return render(request, 'conference/confirm_participation.html', {
-        'submission': submission,
-        'coauthors': coauthors,
-    })
-
-
-@login_required
-def checkout_view(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-
-    if submission.payment_status:
-        messages.error(request, "You have already completed payment.")
-        return redirect('payment', paper_id=paper_id)
-
-    try:
-        registration = FinalRegistration.objects.get(submission=submission)
-        participants = registration.participants.all()
-    except FinalRegistration.DoesNotExist:
-        registration = None
-        participants = []
-
-    coauthors = submission.coauthors.all()
-
-    if request.method == 'POST':
-        if registration:
-            registration.participants.all().delete()
-            registration.delete()
-
-        author_mode = request.POST.get('author_mode')
-        author_proof = request.FILES.get('author_identity_proof')
-        total = calculate_fee(submission.category, author_mode, submission.institute)
-
-        registration = FinalRegistration.objects.create(
-            submission=submission,
-            author_mode=author_mode,
-            author_identity_proof=author_proof,
-            total_amount=0
-        )
-
-        for idx, co in enumerate(coauthors):
-            mode = request.POST.get(f'coauthor_mode_{idx}')
-            proof = request.FILES.get(f'coauthor_proof_{idx}')
-            if mode != 'None':
-                FinalParticipant.objects.create(
-                    registration=registration,
-                    name=f"{co.first_name} {co.last_name}",
-                    email=co.email,
-                    affiliation=co.affiliation,
-                    role='CoAuthor',
-                    mode=mode,
-                    identity_proof=proof
-                )
-                total += calculate_fee(co.category, mode, co.affiliation)
-
-        visitor_count = int(request.POST.get('visitor_count', 0))
-        for i in range(visitor_count):
-            name = request.POST.get(f'visitor_name_{i}')
-            email = request.POST.get(f'visitor_email_{i}')
-            affiliation = request.POST.get(f'visitor_affiliation_{i}')
-            mode = request.POST.get(f'visitor_mode_{i}')
-            proof = request.FILES.get(f'visitor_proof_{i}')
-            if name and email and affiliation and mode:
-                FinalParticipant.objects.create(
-                    registration=registration,
-                    name=name,
-                    email=email,
-                    affiliation=affiliation,
-                    role='Visitor',
-                    mode=mode,
-                    identity_proof=proof
-                )
-                total += calculate_fee('NonPresenter', mode, affiliation)
-
-        registration.total_amount = total
-        registration.save()
-        return redirect('payment_summary', paper_id=paper_id)
-
-    return render(request, 'conference/checkout.html', {
-        'submission': submission,
-        'coauthors': coauthors,
-        'registration': registration,
-        'participants': participants,
-    })
-
-
-@login_required
-def payment_view(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-
-    try:
-        registration = FinalRegistration.objects.get(submission=submission)
-    except FinalRegistration.DoesNotExist:
-        messages.error(request, "Please complete final registration before proceeding to payment.")
-        return redirect('checkout', paper_id=paper_id)
-
-    if submission.status != 'APPROVED':
-        messages.error(request, "You can only pay after your abstract is approved.")
-        return redirect('profile')
-
-    return render(request, 'conference/payment.html', {
-        'submission': submission,
-        'registration': registration,
-        'participants': registration.participants.all(),
-        'amount': registration.total_amount
-    })
-
-
-@login_required
-def payment_summary(request, paper_id):
-    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-    try:
-        registration = FinalRegistration.objects.get(submission=submission)
-        participants = FinalParticipant.objects.filter(registration=registration)
-    except FinalRegistration.DoesNotExist:
-        messages.error(request, "Final registration not found.")
-        return redirect('checkout', paper_id=paper_id)
-
-    return render(request, 'conference/payment.html', {
-        'submission': submission,
-        'registration': registration,
-        'participants': participants,
-        'amount': registration.total_amount,
-        'payment_pending': True
-    })
-
-
 # ============ STATIC PAGES ============ #
 def thank_you(request):
     return render(request, 'conference/thankyou.html')
@@ -397,28 +234,366 @@ def contact(request):
 def itinerary(request):
     return render(request, 'conference/itinerary.html')
 
+def pricing_view(request):
+    return render(request, 'conference/pricing.html')
 
-# ============ UTILITY ============ #
+# ---------- Payment realted work here ----------#
+
+from .models import FinalRegistration, FinalParticipant  # Make sure these are imported
+# [...] (keep all your previous imports and unchanged code)
+
 def calculate_fee(category, mode, institute):
+    if not mode or mode == 'None':
+        return 0
+
+    if category == 'NonPresenter':
+        return 15000
+
+    if category == 'International':
+        return 20750 if mode == 'Offline' else 8300
+
     if mode == 'Offline':
         if category == 'Corporate':
             amount = 20000
         elif category in ['Academician', 'Student']:
             amount = 16000
-        elif category == 'NonPresenter':
-            amount = 15000
-        elif category == 'International':
-            amount = 20000
         else:
             amount = 16000
-
-        if 'assam university' in institute.lower():
-            amount -= 1000
     elif mode == 'Online':
-        amount = 2000 if category == 'Corporate' else 1000
+        if category == 'Corporate':
+            amount = 2000
+        else:
+            amount = 1000
     else:
         amount = 0
+
+    if mode == 'Offline' and institute and 'assam university' in institute.lower():
+        amount -= 1000
+
     return amount
 
-def pricing_view(request):
-    return render(request, 'conference/pricing.html')
+
+@login_required
+def checkout_view(request, paper_id):
+    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
+    coauthors = CoAuthor.objects.filter(submission=submission)
+
+    if request.method == 'POST':
+        FinalRegistration.objects.filter(submission=submission).delete()
+
+        author_mode = request.POST.get('author_mode')
+        author_proof = request.FILES.get('author_identity_proof')
+        author_phone = request.POST.get('author_phone')
+        author_address = request.POST.get('author_address')
+        author_gender = request.POST.get('author_gender')
+        presenter = request.POST.get('presenter')
+        selected_theme = request.POST.get('selected_theme')
+
+
+        if author_mode == "Offline" and not author_proof:
+            messages.error(request, "Main author selected Offline but did not upload identity proof.")
+            return redirect('checkout', paper_id=paper_id)
+
+        total = calculate_fee(submission.category, author_mode, submission.institute)
+
+        registration = FinalRegistration.objects.create(
+            submission=submission,
+            author_name=submission.main_author,
+            author_designation=submission.designation,
+            author_mode=author_mode,
+            author_contact=author_phone,
+            author_address=author_address,
+            author_gender=author_gender,
+            author_id_proof=author_proof,
+            presenter_name=presenter,
+            selected_theme=selected_theme,
+            total_amount=0
+        )
+
+        # Co-authors
+        for idx, co in enumerate(coauthors):
+            mode = request.POST.get(f'coauthor_mode_{idx}')
+            proof = request.FILES.get(f'coauthor_proof_{idx}')
+            phone = request.POST.get(f'coauthor_phone_{idx}')
+            address = request.POST.get(f'coauthor_address_{idx}')
+            gender = request.POST.get(f'coauthor_gender_{idx}')
+
+            if not mode:
+                messages.error(request, f"Mode not selected for co-author {co.first_name} {co.last_name}.")
+                return redirect('checkout', paper_id=paper_id)
+
+            if mode == 'Offline' and not proof:
+                messages.error(request, f"Co-author {co.first_name} selected Offline but did not upload identity proof.")
+                return redirect('checkout', paper_id=paper_id)
+
+            institute = co.affiliation or ''
+            fee = calculate_fee(co.category, mode, institute)
+            total += fee
+
+            FinalParticipant.objects.create(
+                registration=registration,
+                name=f"{co.first_name} {co.last_name}",
+                email=co.email,
+                contact=phone,
+                gender=gender,
+                address=address,
+                role="CoAuthor",
+                mode=mode,
+                id_proof=proof,
+                affiliation=co.affiliation
+            )
+
+        # Visitors
+        visitor_count = 0
+        while request.POST.get(f'visitor_name_{visitor_count}'):
+            name = request.POST.get(f'visitor_name_{visitor_count}')
+            email = request.POST.get(f'visitor_email_{visitor_count}')
+            mode = request.POST.get(f'visitor_mode_{visitor_count}')
+            proof = request.FILES.get(f'visitor_proof_{visitor_count}')
+            phone = request.POST.get(f'visitor_phone_{visitor_count}')
+            address = request.POST.get(f'visitor_address_{visitor_count}')
+            gender = request.POST.get(f'visitor_gender_{visitor_count}')
+
+            if mode == 'Offline' and not proof:
+                messages.error(request, f"Visitor '{name}' selected Offline but did not upload identity proof.")
+                return redirect('checkout', paper_id=paper_id)
+
+            total += 15000  # Fixed visitor fee
+
+            FinalParticipant.objects.create(
+                registration=registration,
+                name=name,
+                email=email,
+                contact=phone,
+                gender=gender,
+                address=address,
+                role="Visitor",
+                mode=mode,
+                id_proof=proof
+            )
+
+            visitor_count += 1
+
+        registration.total_amount = total
+        registration.save()
+
+        return redirect('payment_summary', paper_id=submission.paper_id)
+
+    return render(request, 'conference/checkout.html', {
+        'submission': submission,
+        'coauthors': coauthors
+    })
+
+#qr code related work here#
+
+from django.shortcuts import render
+import qrcode
+import io
+import base64
+from .forms import PaymentConfirmationForm
+@login_required
+def payment_summary_view(request, paper_id):
+    submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
+    registration = get_object_or_404(FinalRegistration, submission=submission)
+    participants = FinalParticipant.objects.filter(registration=registration)
+
+    # Payment breakdown
+    breakdown = []
+
+    # Main author
+    author_fee = calculate_fee(
+        submission.category,
+        registration.author_mode,
+        submission.institute
+    )
+    breakdown.append({
+        "name": registration.author_name,
+        "role": "Main Author",
+        "mode": registration.author_mode,
+        "fee": author_fee
+    })
+
+    # Co-authors and visitors
+    for p in participants:
+        if p.role == "CoAuthor":
+            category = next((co.category for co in CoAuthor.objects.filter(submission=submission, email=p.email)), "Student")
+            fee = calculate_fee(category, p.mode, (p.affiliation or "").lower())
+
+        elif p.role == "Visitor":
+            fee = 15000
+        else:
+            fee = 0
+        breakdown.append({
+            "name": p.name,
+            "role": p.role,
+            "mode": p.mode,
+            "fee": fee
+        })
+
+    # Generate QR Code
+    upi_id = "dbaconferenceassamuniversity@idbi"
+    name = "IBSSC 2025"
+    amount = registration.total_amount
+    upi_link = f"upi://pay?pa={upi_id}&pn={name}&am={amount}&cu=INR"
+
+    qr = qrcode.make(upi_link)
+    buffer = io.BytesIO()
+    qr.save(buffer, format="PNG")
+    img_str = base64.b64encode(buffer.getvalue()).decode()
+
+    if request.method == 'POST':
+        form = PaymentConfirmationForm(request.POST, request.FILES, instance=registration)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Payment information submitted successfully.")
+            return redirect('thank_you')
+        else:
+            messages.error(request, "Please correct the errors below.")
+    else:
+        form = PaymentConfirmationForm(instance=registration)
+
+    return render(request, 'conference/payment_summary.html', {
+        'submission': submission,
+        'registration': registration,
+        'breakdown': breakdown,
+        'qr_code': img_str,
+        'upi_id': upi_id,
+        'amount': amount,
+        'form': form,
+    })
+
+
+@login_required
+def thank_you_view(request):
+    submission = AbstractSubmission.objects.filter(user=request.user).latest('submitted_on')
+    final_reg = get_object_or_404(FinalRegistration, submission=submission)
+
+    return render(request, 'conference/confirmation.html', {
+        "submission": submission,
+        "final_reg": final_reg,
+    })
+
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
+from .models import FinalRegistration, FinalParticipant
+
+@login_required
+def payment_confirmation_view(request):
+    # Grab the most recent FinalRegistration for this user:
+    final_reg = (
+        FinalRegistration.objects
+        .filter(submission__user=request.user)
+        .order_by('-created_at')
+        .first()
+    )
+    if not final_reg:
+        # no registration found—redirect or show an error
+        return redirect('profile')
+
+    # Pull out submission and participants
+    submission = final_reg.submission
+    coauthors   = final_reg.participants.filter(role='CoAuthor')
+    visitors    = final_reg.participants.filter(role='Visitor')
+
+    return render(request, "conference/confirmation.html", {
+        "submission": submission,
+        "final_reg": final_reg,
+        "coauthors": coauthors,
+        "visitors": visitors,
+    })
+#email for payment confirmation#
+from .models import FinalRegistration, FinalParticipant, CoAuthor, AbstractSubmission
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+
+def send_payment_receipt_email(registration):
+    # Main author affiliation
+    main_inst = registration.submission.institute
+
+    # Gather co‑authors
+    coauthor_objs = registration.participants.filter(role='CoAuthor')
+    coauthors = [
+        {
+            'name': p.name,
+            'affiliation': p.affiliation or 'N/A',
+        }
+        for p in coauthor_objs
+    ]
+
+    # Gather visitors
+    visitor_objs = registration.participants.filter(role='Visitor')
+    visitors = [
+        {
+            'name': p.name,
+            'contact': p.contact,
+        }
+        for p in visitor_objs
+    ]
+
+    # Payment breakdown
+    breakdown = []
+    # main author
+    breakdown.append({
+        'role': 'Main Author',
+        'name': registration.author_name,
+        'fee': registration.total_amount if not coauthor_objs and not visitor_objs else None,  
+        # We'll fill in exact fees next
+    })
+    # Actually compute each fee
+    total = 0
+    # reuse your calculate_fee logic
+    from .views import calculate_fee
+    fee_main = calculate_fee(
+        registration.submission.category,
+        registration.author_mode,
+        registration.submission.institute
+    )
+    breakdown = [{
+        'role': 'Main Author',
+        'name': registration.author_name,
+        'fee': fee_main,
+    }]
+    total += fee_main
+
+    for p in coauthor_objs:
+        # find category from CoAuthor model
+        cat = CoAuthor.objects.get(
+            submission=registration.submission, email=p.email
+        ).category
+        fee = calculate_fee(cat, p.mode, (p.affiliation or '').lower())
+        breakdown.append({
+            'role': 'Co-Author',
+            'name': p.name,
+            'fee': fee,
+        })
+        total += fee
+
+    for p in visitor_objs:
+        fee = 15000
+        breakdown.append({
+            'role': 'Visitor',
+            'name': p.name,
+            'fee': fee,
+        })
+        total += fee
+
+    subject = "Payment Confirmed – IBSSC 2025"
+    to_email = registration.submission.user.email
+    context = {
+        'name': registration.author_name,
+        'affiliation': main_inst,
+        'paper_id': registration.submission.paper_id,
+        'paper_title': registration.submission.title,
+        'theme': registration.selected_theme,
+        'total_amount': total,
+        'transaction_id': registration.transaction_id,
+        'transaction_date': registration.transaction_date,
+        'coauthors': coauthors,
+        'visitors': visitors,
+        'breakdown': breakdown,
+    }
+
+    html_content = render_to_string('payment_receipt.html', context)
+    email = EmailMessage(subject, html_content, to=[to_email])
+    email.content_subtype = "html"
+    email.send()
