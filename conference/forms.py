@@ -18,10 +18,6 @@ from .models import (
     FinalRegistration, FinalParticipant,
 )
 
-from .forms import (
-    AbstractSubmissionForm,
-    FullPaperUploadForm,
-)
 
 # ============ HOME ============ #
 def index(request):
