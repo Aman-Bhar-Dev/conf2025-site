@@ -1,6 +1,6 @@
-# Ignore all migration files
-conference/migrations/
-
-# But allow actual migration scripts (not pyc)
+# Ignore everything in the migrations folder
+conference/migrations/*
+# But do NOT ignore the .py migration files
 !conference/migrations/*.py
-!conference/migrations/__init__.py
+# Also do NOT ignore the folder itself (needed for exceptions to work)
+!conference/migrations/
