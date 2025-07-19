@@ -1,0 +1,142 @@
+{% load static %}
+{% load humanize %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Summary</title>
+  <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+  <style>
+    .container {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      text-align: center;
+    }
+    th {
+      background-color: #f5f5f5;
+    }
+    .qr-wrapper {
+      text-align: center;
+      margin: 40px 0 20px;
+    }
+    .qr-wrapper img {
+      width: 240px;
+      height: 240px;
+      border: 8px solid #f1f1f1;
+    }
+    .upload-form {
+      max-width: 500px;
+      margin: 40px auto 0;
+      padding: 20px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background-color: #fafafa;
+    }
+    .upload-form label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+    .upload-form input, .upload-form button {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .upload-form button {
+      background-color: #4CAF50;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    .upload-form .errorlist {
+      color: red;
+      margin-top: 4px;
+      margin-bottom: 0;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <h2>Payment Summary</h2>
+
+    <!-- Breakdown Table -->
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Mode</th>
+          <th>Fee (₹)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in breakdown %}
+        <tr>
+          <td>{{ item.name }}</td>
+          <td>{{ item.role }}</td>
+          <td>{{ item.mode }}</td>
+          <td>{{ item.fee|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="3"><strong>Total Payable</strong></td>
+          <td><strong>₹{{ amount|intcomma }}</strong></td>
+        </tr>
+      </tfoot>
+    </table>
+
+    <!-- QR Payment -->
+    <div class="qr-wrapper">
+      <p><strong>Pay To:</strong> {{ upi_id }}</p>
+      <p>Scan the QR using any UPI app:</p>
+      <img src="data:image/png;base64,{{ qr_code }}" alt="QR Code">
+    </div>
+
+    <!-- Screenshot + Payment Info Upload -->
+    <form method="POST" enctype="multipart/form-data" class="upload-form">
+      {% csrf_token %}
+      {% if messages %}
+        {% for message in messages %}
+          <p style="color: green; font-weight: bold;">{{ message }}</p>
+        {% endfor %}
+      {% endif %}
+
+      {{ form.non_field_errors }}
+
+      <label for="id_transaction_id">Transaction ID</label>
+      {{ form.transaction_id }}
+      {{ form.transaction_id.errors }}
+
+      <label for="id_transaction_date">Transaction Date</label>
+      {{ form.transaction_date }}
+      {{ form.transaction_date.errors }}
+
+      <label for="id_transaction_time">Transaction Time</label>
+      {{ form.transaction_time }}
+      {{ form.transaction_time.errors }}
+
+      <label for="id_payment_screenshot">Upload Payment Screenshot</label>
+      {{ form.payment_screenshot }}
+      {{ form.payment_screenshot.errors }}
+
+      <button type="submit">Submit Payment Details</button>
+    </form>
+  </main>
+</body>
+</html>

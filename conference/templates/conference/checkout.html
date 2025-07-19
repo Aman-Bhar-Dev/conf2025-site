@@ -1,0 +1,215 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Final Registration | IBSSC 2025</title>
+  <link rel="stylesheet" href="{% static 'css/checkout.css' %}">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">IBSSC<span>2025</span></div>
+    <ul class="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      <li><a href="{% url 'profile' %}">Profile</a></li>
+      <li><a href="{% url 'logout' %}">Logout</a></li>
+    </ul>
+  </nav>
+
+  <main class="container">
+    <h2>Final Registration</h2>
+    <form id="checkout-form" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <!-- Author -->
+      <section>
+        <h3>Main Author</h3>
+        <p><strong>Name:</strong> {{ submission.main_author }}</p>
+        <p><strong>Designation:</strong> {{ submission.designation }}</p>
+
+        <label>Contact Number:</label>
+        <input type="text" name="author_phone" required>
+
+        <label>Address:</label>
+        <textarea name="author_address" required></textarea>
+
+        <label>Gender:</label>
+        <select name="author_gender" required>
+          <option value="">-- Select --</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+
+        <label>Mode of Participation:</label>
+        <select name="author_mode" id="author_mode" required
+                data-category="{{ submission.category }}"
+                data-institute="{{ submission.institute }}">
+
+          <option value="">-- Select --</option>
+          <option value="Online">Online</option>
+          <option value="Offline">Offline</option>
+        </select>
+
+        <div class="proof-wrapper">
+          <label>Upload Identity Proof:</label>
+          <input type="file" name="author_identity_proof" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+      </section>
+
+    <!-- Co-Authors -->
+    {% if coauthors %}
+    <section>
+      <h3>Co-Authors</h3>
+      {% for coauthor in coauthors %}
+      <div class="coauthor-block" id="coauthor-block-{{ forloop.counter0 }}">
+        <h4>{{ coauthor.first_name }} {{ coauthor.last_name }}</h4>
+        <p><strong>Email:</strong> {{ coauthor.email }}</p>
+        <p><strong>Designation:</strong> {{ coauthor.designation }}</p>
+
+        <label>Contact Number:</label>
+        <input type="text" name="coauthor_phone_{{ forloop.counter0 }}" required>
+
+        <label>Address:</label>
+        <textarea name="coauthor_address_{{ forloop.counter0 }}" required></textarea>
+
+        <label>Gender:</label>
+        <select name="coauthor_gender_{{ forloop.counter0 }}" required>
+          <option value="">-- Select --</option>
+          <option>Male</option>
+          <option>Female</option>
+          <option>Other</option>
+        </select>
+
+        <label>Mode of Participation:</label>
+        <select name="coauthor_mode_{{ forloop.counter0 }}"
+                class="coauthor-mode"
+                data-index="{{ forloop.counter0 }}"
+                data-category="{{ coauthor.category }}"
+                data-institute="{{ coauthor.institute }}"
+                required>
+          <option value="">-- Select --</option>
+          <option value="Online">Online</option>
+          <option value="Offline">Offline</option>
+        </select>
+
+        <div class="proof-wrapper">
+          <label>Upload Identity Proof: (Voter I card/ passport accepted)</label>
+          <input type="file" name="coauthor_proof_{{ forloop.counter0 }}" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+
+      <!-- Presenter Selection -->
+      <section>
+        <h3>Presenter</h3>
+        <label for="presenter">Select Presenter:</label>
+        <select name="presenter" id="presenter" required>
+          <option value="">-- Select Presenter --</option>
+          <option value="{{ submission.main_author }}">Main Author - {{ submission.main_author }}</option>
+          {% for coauthor in coauthors %}
+          <option value="{{ coauthor.first_name }} {{ coauthor.last_name }}">Co-author - {{ coauthor.first_name }} {{ coauthor.last_name }}</option>
+          {% endfor %}
+        </select>
+      </section>
+      <!-- Visitors -->
+      <section>
+        <h3>Visitors</h3>
+        <div id="visitors-container"></div>
+        <button type="button" id="add-visitor">+ Add Visitor</button>
+        <p><strong>Visitor Fee:</strong> ₹15,000 per visitor</p>
+      </section>
+    <div class="form-group">
+      <label for="selected_theme">Select Conference Theme:</label>
+      <select class="form-control" name="selected_theme" id="selected_theme" required>
+        <option value="">-- Choose a Theme --</option>
+        <option value="Society, Equity, Transformation & Social Work">Society, Equity, Transformation & Social Work</option>
+        <option value="Knowledge, Education & Human Development">Knowledge, Education & Human Development</option>
+        <option value="Politics, Governance, Public Policy, and Political Science">Politics, Governance, Public Policy, and Political Science</option>
+        <option value="Economy, Technology & Social Impact">Economy, Technology & Social Impact</option>
+        <option value="Culture, Identity & Globalization">Culture, Identity & Globalization</option>
+        <option value="Environment, Climate & Sustainability">Environment, Climate & Sustainability</option>
+        <option value="Business, Commerce and Business Sustainability">Business, Commerce and Business Sustainability</option>
+        <option value="General Social Science and Topics Not Falling Under the Above Categories">General Social Science and Topics Not Falling Under the Above Categories</option>
+      </select>
+    </div>
+
+
+
+      <button type="submit" class="submit-button">Proceed to Payment</button>
+    </form>
+  </main>
+
+  <script>
+    const authorCategory = "{{ submission.category|escapejs }}";
+    const authorInstitute = "{{ submission.institute|escapejs }}";
+    const coauthorCount = {{ coauthors|length }};
+  </script>
+  <script>
+    document.getElementById('checkout-form').addEventListener('submit', function (e) {
+      let form = this;
+      let isValid = true;
+      let firstInvalid = null;
+
+      // Clear previous warnings
+      document.querySelectorAll('.warning-message').forEach(el => el.remove());
+
+      // Helper to show warning
+      function warn(input, message) {
+        if (!input) return;
+        isValid = false;
+        input.classList.add('input-error');
+        const warning = document.createElement('div');
+        warning.className = 'warning-message';
+        warning.style.color = 'red';
+        warning.style.fontSize = '0.85em';
+        warning.innerText = message;
+        input.insertAdjacentElement('afterend', warning);
+        if (!firstInvalid) firstInvalid = input;
+      }
+
+      // Check main author fields
+      const authorPhone = form.querySelector('[name="author_phone"]');
+      const authorAddress = form.querySelector('[name="author_address"]');
+      const authorGender = form.querySelector('[name="author_gender"]');
+      const authorMode = form.querySelector('[name="author_mode"]');
+      const authorProof = form.querySelector('[name="author_identity_proof"]');
+
+      if (!authorPhone.value.trim()) warn(authorPhone, 'Contact number required');
+      if (!authorAddress.value.trim()) warn(authorAddress, 'Address required');
+      if (!authorGender.value) warn(authorGender, 'Gender required');
+      if (!authorMode.value) warn(authorMode, 'Participation mode required');
+      if (authorMode.value === 'Offline' && !authorProof.files.length) warn(authorProof, 'Upload identity proof');
+
+      // Co-author validations
+      const coauthorCount = {{ coauthors|length }};
+      for (let i = 0; i < coauthorCount; i++) {
+        const mode = form.querySelector(`[name="coauthor_mode_${i}"]`);
+        const phone = form.querySelector(`[name="coauthor_phone_${i}"]`);
+        const address = form.querySelector(`[name="coauthor_address_${i}"]`);
+        const gender = form.querySelector(`[name="coauthor_gender_${i}"]`);
+        const proof = form.querySelector(`[name="coauthor_proof_${i}"]`);
+
+        if (!mode.value) warn(mode, 'Select mode');
+        if (mode.value === 'Online' || mode.value === 'Offline') {
+          if (!phone.value.trim()) warn(phone, 'Contact required');
+          if (!address.value.trim()) warn(address, 'Address required');
+          if (!gender.value) warn(gender, 'Gender required');
+          if (mode.value === 'Offline' && !proof.files.length) warn(proof, 'Upload identity proof');
+        }
+      }
+
+      if (!isValid) {
+        e.preventDefault();
+        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    });
+  </script>
+
+  <script src="{% static 'js/checkout.js' %}"></script>
+</body>
+</html>

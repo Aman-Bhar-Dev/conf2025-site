@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Payment Submitted Successfully | IBSSC 2025</title>
+  <link rel="stylesheet" href="{% static 'css/confirmation.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="success-icon">✅</div>
+    <h1>Registration Successful!</h1>
+    <p>Thank you for completing your registration for <strong>IBSSC 2025</strong>.</p>
+
+    <div class="summary">
+      <p><strong>Paper ID:</strong> {{ submission.paper_id }}</p>
+      <p><strong>Paper Title:</strong> {{ submission.title }}</p>
+      <p><strong>Main Author:</strong> {{ final_reg.author_name }}</p>
+      <p><strong>Contact:</strong> {{ final_reg.author_contact }}</p>
+      <p><strong>Mode:</strong> {{ final_reg.author_mode }}</p>
+      <p><strong>Total Paid:</strong> ₹{{ final_reg.total_amount }}</p>
+    </div>
+
+    <div class="coauthor-section">
+      <h3>Co‑Authors</h3>
+      {% if coauthors %}
+        <ul>
+          {% for c in coauthors %}
+            <li>
+              {{ c.name }} – {{ c.affiliation|default:"N/A" }}<br>
+              Email: {{ c.email }} | Phone: {{ c.contact }} | Mode: {{ c.mode }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No co‑authors registered.</p>
+      {% endif %}
+    </div>
+
+    <div class="visitor-section">
+      <h3>Visitors</h3>
+      {% if visitors %}
+        <ul>
+          {% for v in visitors %}
+            <li>
+              {{ v.name }} – {{ v.affiliation|default:"N/A" }}<br>
+              Email: {{ v.email|default:"N/A" }} | Phone: {{ v.contact }} | Mode: {{ v.mode }}
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p>No visitors added.</p>
+      {% endif %}
+    </div>
+
+    <p style="margin-top: 30px;">
+      Our team will verify your payment shortly. You’ll get a confirmation email &amp; receipt once verified.
+    </p>
+
+    <div class="btn-group">
+      <a href="{% url 'profile' %}" class="btn">Go to Profile</a>
+    </div>
+  </div>
+</body>
+</html>

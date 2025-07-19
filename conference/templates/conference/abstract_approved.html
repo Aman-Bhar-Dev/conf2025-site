@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <body style="font-family:Arial, sans-serif; color:#333;">
+    <p>Dear {{ author_name }},</p>
+
+    <p>
+      We are pleased to inform you that your abstract has been <strong>approved</strong> for IBSSC 2025.
+    </p>
+
+    <p><strong>Paper Title:</strong> {{ title }}</p>
+    <p><strong>Paper ID:</strong> {{ paper_id }}</p>
+    <p><strong>Affiliation:</strong> {{ affiliation }}</p>
+
+    {% if coauthors %}
+    <p><strong>Co-Authors:</strong></p>
+    <ul>
+      {% for co in coauthors %}
+        <li>{{ co.first_name }} {{ co.last_name }} ({{ co.affiliation }}) – {{ co.email }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+
+    <p>
+      👉 Join our official WhatsApp group for updates:  
+      <a href="https://chat.whatsapp.com/CPEaa6ek2ur0q6vL7nHJGT">
+        https://chat.whatsapp.com/CPEaa6ek2ur0q6vL7nHJGT
+      </a>
+    </p>
+
+    <p>Regards,<br>IBSSC Secretariat</p>
+  </body>
+</html>
