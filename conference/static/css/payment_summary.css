@@ -1,0 +1,21 @@
+.breakdown-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 2rem;
+}
+.breakdown-table th, .breakdown-table td {
+  border: 1px solid #ccc;
+  padding: 8px 12px;
+  text-align: center;
+}
+.breakdown-table th {
+  background-color: #f5f5f5;
+}
+.upi-box {
+  text-align: center;
+}
+.qr-code {
+  width: 200px;
+  height: 200px;
+  margin-top: 10px;
+}

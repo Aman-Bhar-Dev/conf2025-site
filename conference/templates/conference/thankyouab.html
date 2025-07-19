@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Abstract Submitted | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+  <style>
+    .thankyou-container {
+      max-width: 600px;
+      margin: 5rem auto;
+      text-align: center;
+      background-color: #f7faff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .thankyou-container h2 {
+      color: #0077b6;
+      margin-bottom: 1rem;
+    }
+
+    .thankyou-container p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .thankyou-container a.button {
+      background-color: #0077b6;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      transition: background-color 0.3s ease;
+    }
+
+    .thankyou-container a.button:hover {
+      background-color: #005f8f;
+    }
+  </style>
+</head>
+<body>
+  <div class="thankyou-container">
+    <h2>Abstract Uploaded Successfully!</h2>
+    <p>Please check your profile to view the approval status of your submission.</p>
+    <a href="{% url 'profile' %}" class="button">Go to Profile</a>
+  </div>
+</body>
+</html>

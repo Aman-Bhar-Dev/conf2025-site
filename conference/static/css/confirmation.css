@@ -1,0 +1,119 @@
+/* static/css/confirmation.css */
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f8f9fa;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+.container {
+  max-width: 700px;
+  margin: 80px auto;
+  padding: 40px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 3rem;
+  color: #28a745;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+  color: #28a745;
+}
+
+.container > p {
+  font-size: 1.1rem;
+}
+
+.summary,
+.coauthor-section,
+.visitor-section {
+  text-align: left;
+  margin-top: 30px;
+  background: #f1f3f5;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.summary p {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.coauthor-section h3,
+.visitor-section h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #0056b3;
+}
+
+.coauthor-section ul,
+.visitor-section ul {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+.coauthor-section li,
+.visitor-section li {
+  background: #fff;
+  border: 1px solid #dee2e6;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  line-height: 1.4;
+}
+
+.coauthor-section li:last-child,
+.visitor-section li:last-child {
+  margin-bottom: 0;
+}
+
+.btn-group {
+  margin-top: 40px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #0056b3;
+}
+
+/* make it mobile-friendly */
+@media (max-width: 600px) {
+  .container {
+    margin: 40px 16px;
+    padding: 24px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .summary p, .container > p {
+    font-size: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}

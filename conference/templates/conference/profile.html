@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile | Conf2025</title>
+  <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+
+<body>
+<nav class="navbar">
+  <div class="logo">IBSSC<span>2025</span></div>
+  <ul class="nav-links">
+    <li><a href="{% url 'home' %}">Home</a></li>    
+    <li><a href="{% url 'submit' %}">Submit</a></li>
+    <li><a href="{% url 'profile' %}" class="active">My Profile</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+  </ul>
+</nav>
+
+<main class="profile-container">
+  <h2>Welcome, {{ user.first_name }}!</h2>
+
+  <div class="profile-card">
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Username:</strong> {{ user.username }}</p>
+    <p><strong>Date Joined:</strong> {{ user.date_joined|date:"F d, Y" }}</p>
+    <p><strong>Phone:</strong> {{ user.userprofile.phone }}</p>
+  </div>
+
+  <div class="submission-list">
+    <h3>Your Submissions</h3>
+    {% if submissions %}
+      <table class="submission-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Status</th>
+            <th>Abstract</th>
+            <th>Next Steps</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for submission in submissions %}
+          <tr>
+            
+            <td data-label="Title">{{ submission.title }}</td>
+            <td data-label="Status">
+              {% if submission.status == 'PENDING' %}
+                <span class="status pending">Pending</span>
+              {% elif submission.status == 'APPROVED' %}
+                <span class="status approved">Approved</span>
+              {% elif submission.status == 'REJECTED' %}
+                <span class="status rejected">Rejected</span>
+              {% endif %}
+            </td>
+            <td data-label="Abstract">
+              {% if submission.abstract_file %}
+                <a href="{{ submission.abstract_file.url }}" target="_blank">View</a> |
+                <a href="{{ submission.abstract_file.url }}" download>Download</a>
+              {% else %}
+                N/A
+              {% endif %}
+            </td>
+            <td data-label="Next Steps">
+              {% if submission.status == 'PENDING' %}
+                Waiting for abstract approval
+              {% elif submission.status == 'REJECTED' %}
+                Abstract Rejected
+              {% elif submission.status == 'APPROVED' %}
+                <div>
+                  {% if submission.full_paper %}
+                    ✅ Full Paper Submitted<br>
+                    <a href="{{ submission.full_paper.url }}" target="_blank">View</a> |
+                    <a href="{{ submission.full_paper.url }}" download>Download</a>
+                  {% else %}
+                    <form method="post" enctype="multipart/form-data" id="upload-form-{{ submission.id }}" style="display: inline;">
+                      {% csrf_token %}
+                      <input type="hidden" name="submission_id" value="{{ submission.id }}">
+                      <input type="file" id="file-input-{{ submission.id }}" name="full_paper" accept="application/pdf" style="display: none;" onchange="document.getElementById('upload-form-{{ submission.id }}').submit()">
+                      <button type="button" class="upload-label" onclick="document.getElementById('file-input-{{ submission.id }}').click()">Upload Full Paper</button>
+                    </form>
+                  {% endif %}
+                  <div style="margin-top: 1rem;">
+                    {# 1) never checked out -> Make Payment #}
+                    {% if not submission.finalregistration %}
+                      <a href="{% url 'checkout' submission.paper_id %}" class="pay-button">Make Payment</a>
+
+                    {# 2) checked out but not yet verified -> Under Approval #}
+                    {% elif not submission.finalregistration.payment_verified %}
+                      <span class="pay-button disabled under-approval">⏳ Under Approval</span>
+
+                    {# 3) verified -> Payment Approved #}
+                    {% else %}
+                      <span class="pay-button disabled approved">✅ Payment Approved</span>
+                    {% endif %}
+                  </div>
+
+                </div>
+              {% endif %}
+            </td>
+            
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>You haven't submitted any papers yet.</p>
+    {% endif %}
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,148 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Register | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/signup.css' %}">
+</head>
+<body>
+
+<header class="navbar">
+  <div class="logo">Conf<span>2025</span></div>
+  <nav class="nav-links" id="navLinks">
+    <a href="{% url 'home' %}">Home</a>
+    <a href="{% url 'about' %}">About</a>
+    <a href="{% url 'contact' %}">Contact</a>
+    <a href="{% url 'itinerary' %}">itinerary</a>
+    <a href="{% url 'submit' %}">Submit</a>
+    {% if user.is_authenticated %}
+      <a href="{% url 'profile' %}">My Profile</a>
+      <a href="{% url 'logout' %}">Logout</a>
+    {% else %}
+      <a href="{% url 'signup' %}"class="active">Register</a>
+      <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+  </nav>
+  <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+</header>
+
+<div class="login-container">
+  <form class="login-form" method="post">
+    {% if messages %}
+      <div class="messages">
+       {% for message in messages %}
+         <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+       {% endfor %}
+      </div>
+    {% endif %}
+    {% csrf_token %}
+    <h2>Create Your Account</h2>
+
+
+    <label for="fullname">Full Name</label>
+    <input type="text" id="fullname" name="fullname" required>
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="phone">Phone Number</label>
+    <input type="tel" id="phone" name="phone" required>
+
+    <label for="institution">Institution / Affiliation</label>
+    <select id="institution" name="institution" required onchange="toggleCustomInstitution(this.value)">
+      <option value="" disabled selected>Select your institution</option>
+      <option value="Assam University, Silchar">Assam University, Silchar</option>
+      <option value="ROYAL THIMPHU COLLEGE, BHUTAN">ROYAL THIMPHU COLLEGE, BHUTAN</option>
+      <option value="Others">Others</option>
+    </select>
+
+    <div id="customInstitutionDiv" style="display:none; margin-top: 10px;">
+      <label for="custom_institution">Enter Institution Name</label>
+      <input type="text" id="custom_institution" name="custom_institution">
+    </div>
+
+
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required>
+    <small id="passwordStrength" class="strength-indicator"></small>
+
+
+    <label for="confirm-password">Confirm Password</label>
+    <input type="password" id="confirm-password" name="confirm-password" required>
+
+    <div class="password-toggle-wrapper">
+      <span class="password-toggle" onclick="togglePasswords()">👁 Show/Hide Passwords</span>
+    </div>
+
+    <button type="button" class="view-terms-btn" onclick="showModal()">View Terms and Conditions</button>
+
+    <div class="checkbox-group">
+      <input type="checkbox" id="terms" onchange="checkTC()">
+      <label for="terms">I agree to the Terms and Conditions</label>
+    </div>
+
+    <div class="btn-group">
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>Register</button>
+      <button type="reset" class="reset-btn">Clear All</button>
+    </div>
+
+    <div class="form-note">
+      Already registered? <a href="{% url 'login' %}" class="login-link">Login here</a>
+    </div>
+  </form>
+</div>
+
+<!-- Terms Modal -->
+<div id="termsModal" class="modal">
+  <div class="modal-content">
+    <h3>Terms and Conditions</h3>
+    <ul>
+      <li>Participants must provide accurate personal information.</li>
+      <li>Registration is non-transferable once submitted.</li>
+      <li>Organizers reserve the right to disqualify false submissions.</li>
+      <li>All personal data will be used only for conference purposes.</li>
+      <li>By registering, you agree to receive official communication via email.</li>
+    </ul>
+    <button class="close-modal" onclick="hideModal()">Close</button>
+  </div>
+</div>
+
+<script>
+  function togglePasswords() {
+    const passFields = [document.getElementById('password'), document.getElementById('confirm-password')];
+    passFields.forEach(field => {
+      field.type = field.type === 'password' ? 'text' : 'password';
+    });
+  }
+
+  function checkTC() {
+    document.getElementById('submitBtn').disabled = !document.getElementById('terms').checked;
+  }
+
+  function showModal() {
+    document.getElementById('termsModal').style.display = 'block';
+  }
+
+  function hideModal() {
+    document.getElementById('termsModal').style.display = 'none';
+  }
+
+  function toggleMenu() {
+    document.getElementById('navLinks').classList.toggle('show');
+  }
+    function toggleCustomInstitution(value) {
+    const customDiv = document.getElementById('customInstitutionDiv');
+    if (value === 'Others') {
+      customDiv.style.display = 'block';
+      document.getElementById('custom_institution').required = true;
+    } else {
+      customDiv.style.display = 'none';
+      document.getElementById('custom_institution').required = false;
+    }
+  }
+</script>
+
+</body>
+</html>

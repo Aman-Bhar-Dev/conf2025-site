@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/login.css' %}" />
+</head>
+<body>
+  <!-- Navbar -->
+<header class="navbar">
+  <div class="nav-logo">Conf<span>2025</span></div>
+
+  <!-- Hamburger Toggle Button -->
+  <button id="hamburger" class="hamburger" aria-label="Toggle navigation">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <nav>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="{% url 'home' %}">Home</a></li>
+      <li><a href="{% url 'about' %}">About</a></li>
+      <li><a href="{% url 'contact' %}">Contact</a></li>
+      <li><a href="{% url 'itinerary' %}">Itinerary</a></li>
+      <li><a href="{% url 'submit' %}">Submit</a></li>
+      {% if user.is_authenticated %}
+        <li><span class="welcome-text">Welcome, {{ user.first_name }}</span></li>
+        <li><a href="{% url 'logout' %}">Logout</a></li>
+      {% else %}
+        <li><a href="{% url 'signup' %}">Register</a></li>
+        <li><a href="{% url 'login' %}" class="active">Login</a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</header>
+
+
+  <!-- Login Form -->
+  <main class="login-container">
+    <form class="login-form" method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+
+      <h2>Member Login</h2>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" placeholder="Enter your email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" placeholder="Enter your password" required />
+
+      <button type="submit">Login</button>
+
+      <p class="form-note">Forgot your password? <a href="{% url 'password_reset' %}">Reset here</a></p>
+      <p class="form-note">
+        Don't have an account?
+        <a href="{% url 'home' %}">Please register from homepage</a>
+      </p>
+    </form>
+  </main>
+
+  <script>
+    // Responsive nav toggle
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggle = document.getElementById('nav-toggle');
+      const navLinks = document.getElementById('nav-links');
+      toggle.addEventListener('change', () => {
+        navLinks.classList.toggle('show');
+      });
+    });
+  </script>
+</body>
+</html>
+         

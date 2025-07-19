@@ -1,0 +1,204 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Submit Abstract | IBSSC2025</title>
+  <link rel="stylesheet" href="{% static 'css/submit.css' %}">
+  <style>
+    .hidden { display: none; }
+    .co-author-group {
+      border: 1px dashed #ccc;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 5px;
+      position: relative;
+    }
+    .remove-button {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<nav class="navbar">
+  <div class="logo">IBSSC<span>2025</span></div>
+  <ul class="nav-links">
+    <li><a href="{% url 'home' %}">Home</a></li>
+    <li><a href="{% url 'submit' %}">Submit</a></li>
+    <li><a href="{% url 'profile' %}">My Profile</a></li>
+    <li><a href="{% url 'logout' %}">Logout</a></li>
+  </ul>
+</nav>
+
+<div class="form-wrapper">
+  <h2>Submit Your Abstract</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="form-card">
+      <label for="id_title">Paper Title</label>
+      <input type="text" name="title" id="id_title" required>
+
+      <label>Corresponding Author's Name</label>
+      <input type="text" name="name" required>
+
+      <label>Institute</label>
+      <select name="institute" id="institute-select" required>
+        <option value="">-- Select --</option>
+        <option value="Assam University, Silchar">Assam University, Silchar</option>
+        <option value="ROYAL THIMPHU COLLEGE, BHUTAN">ROYAL THIMPHU COLLEGE, BHUTAN</option>
+        <option value="Others">Other</option>
+      </select>
+
+      <div id="custom-institute-wrapper" class="hidden">
+        <label>Enter Your Institute</label>
+        <input type="text" name="custom_institute">
+      </div>
+
+      <label>Designation</label>
+      <select name="designation" required>
+        <option value="">-- Select --</option>
+        <option value="Student">Student</option>
+        <option value="Research Scholar">Research Scholar</option>
+        <option value="Assistant Professor">Assistant Professor</option>
+        <option value="Associate Professor">Associate Professor</option>
+        <option value="Professor">Professor</option>
+        <option value="Corporate">Corporate</option>
+      </select>
+
+      <label>Mode of Participation</label>
+      <select name="mode_of_participation" required>
+        <option value="">-- Select --</option>
+        <option value="Offline">Offline</option>
+        <option value="Online">Online</option>
+      </select>
+
+      <label>Category</label>
+      <select name="category" required>
+        <option value="">-- Select --</option>
+        <option value="Academician">Academician</option>
+        <option value="Corporate">Corporate</option>
+        <option value="Student">Research Scholar / Student</option>
+        <option value="NonPresenter">Non-presenter / Listener</option>
+        <option value="International">International (Non-Indian, Non-Bhutanese)</option>
+      </select>
+
+      <label>Keywords</label>
+      <input type="text" name="keywords" required>
+
+      <label>Upload Abstract File (PDF/DOCX)</label>
+      <input type="file" name="abstract_file" accept=".pdf,.doc,.docx" required>
+    </div>
+
+    <div class="form-card">
+      <h3>Co-Authors</h3>
+      <div id="coauthor-container"></div>
+      <button type="button" onclick="addCoAuthor()">+ Add Co-Author</button>
+    </div>
+
+    <div class="center buttons">
+      <button type="submit" class="submit-button">Submit Abstract</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  // Main author custom institute logic
+  document.getElementById("institute-select").addEventListener("change", function () {
+    const wrapper = document.getElementById("custom-institute-wrapper");
+    const customInput = wrapper.querySelector('input');
+    if (this.value === "Others") {
+      wrapper.classList.remove("hidden");
+      customInput.required = true;
+    } else {
+      wrapper.classList.add("hidden");
+      customInput.required = false;
+    }
+  });
+
+  // Co-author logic
+  let coauthorCount = 0;
+
+  function addCoAuthor() {
+    const container = document.getElementById("coauthor-container");
+    const div = document.createElement("div");
+    div.className = "co-author-group";
+    div.innerHTML = `
+      <button type="button" class="remove-button" onclick="this.parentElement.remove()">×</button>
+
+      <label>First Name</label>
+      <input type="text" name="coauthor_first_name_${coauthorCount}" required>
+
+      <label>Last Name</label>
+      <input type="text" name="coauthor_last_name_${coauthorCount}" required>
+
+      <label>Email</label>
+      <input type="email" name="coauthor_email_${coauthorCount}" required>
+
+      <label>Affiliated Institution</label>
+      <select name="coauthor_institute_${coauthorCount}" onchange="handleCoAuthorInstituteChange(${coauthorCount})" required>
+        <option value="">-- Select Institute --</option>
+        <option value="Assam University, Silchar">Assam University, Silchar</option>
+        <option value="ROYAL THIMPHU COLLEGE, BHUTAN">ROYAL THIMPHU COLLEGE, BHUTAN</option>
+        <option value="Others">Other</option>
+      </select>
+
+      <div id="coauthor-custom-institute-${coauthorCount}" style="display:none;">
+        <label>Specify Institute</label>
+        <input type="text" name="coauthor_custom_institute_${coauthorCount}" placeholder="Enter Institute Name">
+      </div>
+
+      <label>Designation</label>
+      <select name="coauthor_designation_${coauthorCount}" required>
+        <option value="">-- Select --</option>
+        <option value="Student">Student</option>
+        <option value="Research Scholar">Research Scholar</option>
+        <option value="Assistant Professor">Assistant Professor</option>
+        <option value="Associate Professor">Associate Professor</option>
+        <option value="Professor">Professor</option>
+        <option value="Corporate">Corporate</option>
+      </select>
+
+      <label>Category</label>
+      <select name="coauthor_category_${coauthorCount}" required>
+        <option value="">-- Select --</option>
+        <option value="Academician">Academician</option>
+        <option value="Corporate">Corporate</option>
+        <option value="Student">Research Scholar / Student</option>
+        <option value="NonPresenter">Non-presenter / Listener</option>
+        <option value="International">International (Non-Indian, Non-Bhutanese)</option>
+      </select>
+    `;
+    container.appendChild(div);
+    coauthorCount++;
+  }
+
+  function handleCoAuthorInstituteChange(index) {
+    const dropdown = document.querySelector(`select[name="coauthor_institute_${index}"]`);
+    const customInputDiv = document.getElementById(`coauthor-custom-institute-${index}`);
+    const inputField = customInputDiv.querySelector('input');
+
+    if (dropdown.value === 'Others') {
+      customInputDiv.style.display = 'block';
+      inputField.required = true;
+    } else {
+      customInputDiv.style.display = 'none';
+      inputField.required = false;
+    }
+  }
+</script>
+
+</body>
+</html>
