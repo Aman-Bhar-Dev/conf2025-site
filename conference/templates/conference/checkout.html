@@ -195,7 +195,7 @@
         const proof = form.querySelector(`[name="coauthor_proof_${i}"]`);
 
         if (!mode.value) warn(mode, 'Select mode');
-        if (mode.value === 'Online' || mode.value === 'Offline') {
+        if (mode.value === 'Offline' || mode.value === 'Offline') {
           if (!phone.value.trim()) warn(phone, 'Contact required');
           if (!address.value.trim()) warn(address, 'Address required');
           if (!gender.value) warn(gender, 'Gender required');
