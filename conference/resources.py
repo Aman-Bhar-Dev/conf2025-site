@@ -40,7 +40,7 @@ class AbstractSubmissionResource(resources.ModelResource):
     class Meta:
         model = AbstractSubmission
         fields = (
-            'paper_id', 'title', 'name', 'email', 'phone', 'institute', 'designation',
+            'mode',   'paper_id', 'title', 'name', 'email', 'phone', 'institute', 'designation',
             'keywords', 'status', 'submitted_on',
             'coauthor1_name', 'coauthor1_email', 'coauthor1_designation', 'coauthor1_affiliation',
             'coauthor2_name', 'coauthor2_email', 'coauthor2_designation', 'coauthor2_affiliation',
