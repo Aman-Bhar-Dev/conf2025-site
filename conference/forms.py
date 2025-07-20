@@ -146,3 +146,5 @@ class PaymentConfirmationForm(forms.ModelForm):
     class Meta:
         model = FinalRegistration
         fields = ['transaction_id', 'transaction_date', 'transaction_time', 'payment_screenshot']
+
+
