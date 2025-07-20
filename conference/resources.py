@@ -6,6 +6,10 @@ class AbstractSubmissionResource(resources.ModelResource):
         column_name='Phone Number',
         attribute='user__profile__phone',
     )
+    mode = fields.Field(
+        column_name='Mode of Participation',
+        attribute='mode_of_participation'
+    )
 
     # CoAuthor 1
     coauthor1_name        = fields.Field(column_name='CoAuthor1 Name')
