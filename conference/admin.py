@@ -280,3 +280,59 @@ class FinalRegistrationAdmin(ExportMixin, admin.ModelAdmin):
             send_payment_receipt_email(obj)
 
         super().save_model(request, obj, form, change)
+
+# conference/admin.py
+
+from django.contrib import admin
+from .models import VisitorRegistration
+
+
+
+# conference/admin.py
+
+from django.contrib import admin
+from django.utils.translation import gettext_lazy as _
+from .models import VisitorRegistration, AdditionalVisitor
+from .emails import send_visitor_approval_email
+
+class AdditionalVisitorInline(admin.TabularInline):
+    model = AdditionalVisitor
+    extra = 0
+
+@admin.register(VisitorRegistration)
+class VisitorRegistrationAdmin(ExportMixin,admin.ModelAdmin):
+    list_display = ('name', 'email', 'status', 'timestamp')
+    list_filter  = ('status', 'timestamp')
+    inlines      = [AdditionalVisitorInline]
+
+    actions = ['approve_and_send_email']
+
+    @admin.action(description=_("Approve selected registrations and send payment email"))
+    def approve_and_send_email(self, request, queryset):
+        for registration in queryset:
+            if registration.status != 'Approved':
+                # 1. Mark approved
+                registration.status = 'Approved'
+                registration.save()
+
+                # 2. Calculate total fee: ₹15,000 per visitor
+                num_additional = registration.additional_visitors.count()
+                total_visitors = 1 + num_additional
+                amount = total_visitors * 15000  # in INR
+
+                # 3. Send email with the computed amount
+                print(f"[DEBUG] Name: {registration.name}, Additional Count: {num_additional}, Total Amount: ₹{amount}")
+
+                send_visitor_approval_email(registration, amount)
+
+        self.message_user(request, _("Selected registrations approved and emails sent."))
+@admin.action(description="✅ Approve selected visitor applications")
+def approve_visitors(modeladmin, request, queryset):
+    updated = queryset.update(status='Approved')
+    modeladmin.message_user(request, f"{updated} application(s) approved.")
+
+@admin.action(description="❌ Reject selected visitor applications")
+def reject_visitors(modeladmin, request, queryset):
+    updated = queryset.update(status='Rejected')
+    modeladmin.message_user(request, f"{updated} application(s) rejected.")
+
