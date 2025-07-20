@@ -597,3 +597,52 @@ def send_payment_receipt_email(registration):
     email = EmailMessage(subject, html_content, to=[to_email])
     email.content_subtype = "html"
     email.send()
+
+
+from django.shortcuts import render, redirect
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from django.conf import settings
+from django.utils.html import strip_tags
+from .models import VisitorRegistration
+
+from .models import VisitorRegistration, AdditionalVisitor
+
+from .emails import send_visitor_submission_confirmation  # make sure this is imported
+def visitor_registration_view(request):
+    if request.method == 'POST':
+        group = VisitorRegistration.objects.create(
+            name=request.POST.get('name'),
+            email=request.POST.get('email'),
+            contact=request.POST.get('contact'),
+            address=request.POST.get('address'),
+            id_proof_type=request.POST.get('id_proof_type'),
+            id_proof_file=request.FILES.get('id_proof_file'),
+        )
+
+        i = 1
+        while True:
+            name = request.POST.get(f'visitor_name_{i}')
+            contact = request.POST.get(f'visitor_contact_{i}')
+            id_type = request.POST.get(f'visitor_id_type_{i}')
+            id_file = request.FILES.get(f'visitor_id_file_{i}')
+
+            if not name:
+                break
+
+            AdditionalVisitor.objects.create(
+                group=group,
+
+                name=name,
+                contact=contact,
+                id_proof_type=id_type,
+                id_proof_file=id_file
+            )
+            i += 1
+
+        # Send confirmation email
+        send_visitor_submission_confirmation(group)
+
+        return render(request, 'conference/visitor_confirmation.html')
+
+    return render(request, 'conference/visitor_registration.html')
