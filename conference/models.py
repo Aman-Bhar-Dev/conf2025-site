@@ -232,3 +232,41 @@ class FinalParticipant(models.Model):
     affiliation = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return f"{self.name} ({self.role})"
+    
+# conference/models.py
+
+from django.db import models
+
+ID_PROOF_CHOICES = [
+    ('passport', 'Passport'),
+    ('voter_id', 'Voter ID'),
+]
+
+STATUS_CHOICES = [
+    ('Pending',  'Pending'),
+    ('Approved', 'Approved'),
+    ('Rejected', 'Rejected'),
+]
+
+class VisitorRegistration(models.Model):
+    name           = models.CharField(max_length=100)
+    email          = models.EmailField()
+    contact        = models.CharField(max_length=15)
+    address        = models.TextField()
+    id_proof_type  = models.CharField(max_length=20, choices=ID_PROOF_CHOICES)
+    id_proof_file  = models.FileField(upload_to='identity_proofs/')
+    status         = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
+    timestamp      = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} ({self.email})"
+
+class AdditionalVisitor(models.Model):
+    group = models.ForeignKey(VisitorRegistration, on_delete=models.CASCADE, related_name='additional_visitors')
+    name = models.CharField(max_length=100)
+    contact = models.CharField(max_length=15)
+    id_proof_type = models.CharField(max_length=20, choices=ID_PROOF_CHOICES)
+    id_proof_file = models.FileField(upload_to='identity_proofs/')
+
+    def __str__(self):
+        return f"{self.name} ({self.contact})"
