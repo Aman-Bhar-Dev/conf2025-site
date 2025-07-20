@@ -1,14 +1,14 @@
 from import_export import resources, fields
 from .models import AbstractSubmission
 
+from import_export import resources, fields
+from .models import AbstractSubmission
+
 class AbstractSubmissionResource(resources.ModelResource):
+    # Pull phone directly via the relation chain user → profile → phone
     phone = fields.Field(
         column_name='Phone Number',
         attribute='user__profile__phone',
-    )
-    mode = fields.Field(
-        column_name='Mode of Participation',
-        attribute='mode_of_participation'
     )
 
     # CoAuthor 1
@@ -44,7 +44,7 @@ class AbstractSubmissionResource(resources.ModelResource):
     class Meta:
         model = AbstractSubmission
         fields = (
-            'mode',   'paper_id', 'title', 'name', 'email', 'phone', 'institute', 'designation',
+            'paper_id', 'title', 'name', 'email', 'phone', 'institute', 'designation',
             'keywords', 'status', 'submitted_on',
             'coauthor1_name', 'coauthor1_email', 'coauthor1_designation', 'coauthor1_affiliation',
             'coauthor2_name', 'coauthor2_email', 'coauthor2_designation', 'coauthor2_affiliation',
@@ -52,6 +52,9 @@ class AbstractSubmissionResource(resources.ModelResource):
             'coauthor4_name', 'coauthor4_email', 'coauthor4_designation', 'coauthor4_affiliation',
             'coauthor5_name', 'coauthor5_email', 'coauthor5_designation', 'coauthor5_affiliation',
         )
+
+    # No need for a dehydrate_phone method anymore,
+    # django-import-export will pull from user__profile__phone automatically.
 
     def dehydrate_coauthor1_name(self, obj):        return obj.get_coauthor1_name()
     def dehydrate_coauthor1_email(self, obj):       return obj.get_coauthor1_email()
@@ -77,8 +80,7 @@ class AbstractSubmissionResource(resources.ModelResource):
     def dehydrate_coauthor5_email(self, obj):       return obj.get_coauthor5_email()
     def dehydrate_coauthor5_designation(self, obj): return obj.get_coauthor5_designation()
     def dehydrate_coauthor5_affiliation(self, obj): return obj.get_coauthor5_affiliation()
-
-
+# conference/resources.py
 from import_export import resources, fields
 from .models import FinalRegistration, FinalParticipant
 
@@ -134,3 +136,94 @@ class FinalRegistrationResource(resources.ModelResource):
               f"{p.name} ({p.email or 'N/A'}, {p.contact}, {p.mode})"
             )
         return "; ".join(parts) or "—"
+
+from import_export import resources, fields
+from .models import VisitorRegistration, AdditionalVisitor
+
+class VisitorRegistrationResource(resources.ModelResource):
+    # Main visitor fields
+    name         = fields.Field(column_name='Name', attribute='name')
+    email        = fields.Field(column_name='Email', attribute='email')
+    contact      = fields.Field(column_name='Contact', attribute='contact')
+    address      = fields.Field(column_name='Address', attribute='address')
+    id_proof_type = fields.Field(column_name='ID Proof Type', attribute='id_proof_type')
+    id_proof_file = fields.Field(column_name='ID Proof File', attribute='id_proof_file')
+    status        = fields.Field(column_name='Status', attribute='status')
+    timestamp     = fields.Field(column_name='Submitted At', attribute='timestamp')
+
+    # Additional visitor 1
+    other_1_name     = fields.Field(column_name='Visitor 1 Name')
+    other_1_contact  = fields.Field(column_name='Visitor 1 Contact')
+    other_1_id_type  = fields.Field(column_name='Visitor 1 ID Type')
+    other_1_id_file  = fields.Field(column_name='Visitor 1 ID File')
+
+    # Additional visitor 2
+    other_2_name     = fields.Field(column_name='Visitor 2 Name')
+    other_2_contact  = fields.Field(column_name='Visitor 2 Contact')
+    other_2_id_type  = fields.Field(column_name='Visitor 2 ID Type')
+    other_2_id_file  = fields.Field(column_name='Visitor 2 ID File')
+
+    # Additional visitor 3
+    other_3_name     = fields.Field(column_name='Visitor 3 Name')
+    other_3_contact  = fields.Field(column_name='Visitor 3 Contact')
+    other_3_id_type  = fields.Field(column_name='Visitor 3 ID Type')
+    other_3_id_file  = fields.Field(column_name='Visitor 3 ID File')
+
+    class Meta:
+        model = VisitorRegistration
+        export_order = [
+            'name', 'email', 'contact', 'address',
+            'id_proof_type', 'id_proof_file',
+            'status', 'timestamp',
+            'other_1_name', 'other_1_contact', 'other_1_id_type', 'other_1_id_file',
+            'other_2_name', 'other_2_contact', 'other_2_id_type', 'other_2_id_file',
+            'other_3_name', 'other_3_contact', 'other_3_id_type', 'other_3_id_file',
+        ]
+
+    def dehydrate_other_1_name(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[0].name if len(visitors) > 0 else ''
+
+    def dehydrate_other_1_contact(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[0].contact if len(visitors) > 0 else ''
+
+    def dehydrate_other_1_id_type(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[0].id_proof_type if len(visitors) > 0 else ''
+
+    def dehydrate_other_1_id_file(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[0].id_proof_file.url if len(visitors) > 0 and visitors[0].id_proof_file else ''
+
+    def dehydrate_other_2_name(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[1].name if len(visitors) > 1 else ''
+
+    def dehydrate_other_2_contact(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[1].contact if len(visitors) > 1 else ''
+
+    def dehydrate_other_2_id_type(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[1].id_proof_type if len(visitors) > 1 else ''
+
+    def dehydrate_other_2_id_file(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[1].id_proof_file.url if len(visitors) > 1 and visitors[1].id_proof_file else ''
+
+    def dehydrate_other_3_name(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[2].name if len(visitors) > 2 else ''
+
+    def dehydrate_other_3_contact(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[2].contact if len(visitors) > 2 else ''
+
+    def dehydrate_other_3_id_type(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[2].id_proof_type if len(visitors) > 2 else ''
+
+    def dehydrate_other_3_id_file(self, obj):
+        visitors = obj.additionalvisitor_set.all()
+        return visitors[2].id_proof_file.url if len(visitors) > 2 and visitors[2].id_proof_file else ''
