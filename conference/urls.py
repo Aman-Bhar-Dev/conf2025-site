@@ -1,6 +1,9 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.contrib.auth.views import LogoutView
+
+
 
 urlpatterns = [
     path('', views.index, name='home'),
@@ -31,7 +34,8 @@ urlpatterns = [
     path('checkout/<str:paper_id>/', views.checkout_view, name='checkout'),
     path('payment-summary/<str:paper_id>/', views.payment_summary_view, name='payment_summary'),
     path('payment/thank-you/', views.payment_confirmation_view, name='thank_you'),
-
-
-
+    path('visitor/register/', views.visitor_registration_view, name='visitor_registration'),
 ]
+
+
+
