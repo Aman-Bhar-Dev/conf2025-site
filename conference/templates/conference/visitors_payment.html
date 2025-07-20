@@ -1,0 +1,38 @@
+<!-- templates/conference/visitors_confirmation_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Visitor Registration Approved</title>
+</head>
+<body>
+  <p>Dear {{ visitor.name }},</p>
+
+  <p>Your visitor registration for <strong>IBSSC 2025</strong> has been approved.</p>
+
+  <p><strong>Amount to Pay:</strong> ₹{{ amount }}</p>
+
+  <p>Please make your payment using the following bank details:</p>
+
+  <ul>
+    <li><strong>Account Name:</strong> {{ bank_details.account_name }}</li>
+    <li><strong>Account Number:</strong> {{ bank_details.account_number }}</li>
+    <li><strong>Bank Name:</strong> {{ bank_details.bank_name }}</li>
+    <li><strong>Branch:</strong> {{ bank_details.branch_name }}</li>
+    <li><strong>SWIFT Code:</strong> {{ bank_details.swift_code }}</li>
+    <li><strong>IFSC Code:</strong> {{ bank_details.ifsc_code }}</li>
+    <li><strong>UPI ID:</strong> {{ bank_details.upi_id }}</li>
+  </ul>
+    <h3>List of Registered Visitors:</h3>
+    <ul>
+    {% for name in visitor_list %}
+        <li>{{ name }}</li>
+    {% endfor %}
+    </ul>
+
+
+  <p>If you have any questions, feel free to reach out to us at <a href="mailto:ibsscconf@gmail.com">ibsscconf@gmail.com</a>.</p>
+
+  <p>Thank you,<br>The IBSSC 2025 Organizing Committee</p>
+</body>
+</html>

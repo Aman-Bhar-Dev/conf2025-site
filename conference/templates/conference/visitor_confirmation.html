@@ -1,0 +1,83 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Application Received | IBSSC 2025</title>
+  <link rel="stylesheet" href="{% static 'css/visitor_confirmation.css' %}">
+</head>
+<body>
+  <div class="thank-you-container">
+    <div class="card">
+      <img src="{% static 'images/checkmark.svg' %}" alt="Success" class="icon">
+      <h1>Thank You, {{ name }}!</h1>
+      <p>Your visitor application has been successfully submitted.</p>
+      <p>We’re reviewing your details now. Once approved, you will receive an email at</p>
+      <p class="highlight">{{ email }}</p>
+      <p>with next steps and payment instructions.</p>
+      <a href="{% url 'home' %}" class="btn">Return to Home</a>
+    </div>
+  </div>
+</body>
+<style> 
+body {
+  margin: 0;
+  padding: 0;
+  background: #f0f4f8;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.thank-you-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: #fff;
+  padding: 40px;
+  max-width: 400px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.icon {
+  width: 60px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0;
+  color: #2a3eb1;
+}
+
+p {
+  color: #555;
+  line-height: 1.5;
+}
+
+.highlight {
+  color: #2a3eb1;
+  font-weight: bold;
+}
+
+.btn {
+  display: inline-block;
+  margin-top: 25px;
+  padding: 12px 25px;
+  background: #2a3eb1;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+
+.btn:hover {
+  background: #1e2b8a;
+}
+
+
+</style>
+</html>

@@ -1,0 +1,208 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Visitor Registration | IBSSC 2025</title>
+  <link rel="stylesheet" href="{% static 'css/visitor_registration.css' %}">
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    form label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+      color: #555;
+    }
+
+    form input[type="text"],
+    form input[type="email"],
+    form input[type="tel"],
+    form textarea,
+    form select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    form input[type="file"] {
+      margin-top: 10px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .note {
+      margin-top: 15px;
+      font-size: 0.9em;
+      color: #777;
+    }
+
+    .add-btn {
+      background-color: #28a745;
+      margin-bottom: 10px;
+    }
+
+    .remove-btn {
+      background-color: crimson;
+      color: white;
+      margin-top: 15px;
+      padding: 8px;
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .warning {
+      text-align: center;
+      color: red;
+      margin-top: 30px;
+      font-size: 1.3em;
+      font-weight: bold;
+    }
+
+    .warning ul {
+      list-style-type: disc;
+      display: inline-block;
+      text-align: left;
+      padding-left: 20px;
+    }
+
+    .visitor-block {
+      margin-top: 30px;
+      border-top: 1px dashed #aaa;
+      padding-top: 20px;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+  <div class="warning">
+    <ul>
+      <li>This form is <strong>not intended for authors</strong></li>
+      <li>This form is <strong>not for co-authors</strong></li>
+      <li>This form is <strong>not for accompanying persons</strong> with any presenter</li>
+      <li>This form is strictly meant for <strong>independent visitors only</strong></li>
+    </ul>
+  </div>
+
+  <div class="container">
+    <h2>Visitor Registration</h2>
+    <form method="post" enctype="multipart/form-data" id="visitor-form">
+      {% csrf_token %}
+
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" required>
+
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" required>
+
+      <label for="contact">Contact Number</label>
+      <input type="tel" id="contact" name="contact" required>
+
+      <label for="address">Postal Address</label>
+      <textarea id="address" name="address" rows="3" required></textarea>
+
+      <label for="id_proof_type">ID Proof Type</label>
+      <select id="id_proof_type" name="id_proof_type" required>
+        <option value="">-- Select ID Proof --</option>
+        <option value="passport">Passport</option>
+        <option value="voter_id">Voter ID</option>
+      </select>
+
+      <label for="id_proof_file">Upload ID Proof</label>
+      <input type="file" id="id_proof_file" name="id_proof_file" accept=".pdf,.jpg,.jpeg,.png" required>
+
+      <!-- Additional Visitors -->
+      <div id="additional-visitors-container"></div>
+
+      <button type="button" id="add-visitor" class="add-btn">+ Add Another Visitor</button>
+
+      <button type="submit">Submit Application</button>
+
+      <div class="note warning">
+        Note: Once approved by the admin, you will receive the payment instructions via email or WhatsApp.
+      </div>
+    </form>
+  </div>
+
+  <script>
+    let visitorCount = 1;
+
+    document.getElementById("add-visitor").addEventListener("click", function () {
+      const container = document.getElementById("additional-visitors-container");
+
+      const block = document.createElement("div");
+      block.className = "visitor-block";
+      block.setAttribute("data-index", visitorCount);
+
+      block.innerHTML = `
+        <h3>Additional Visitor ${visitorCount}</h3>
+
+        <label for="visitor_name_${visitorCount}">Full Name</label>
+        <input type="text" name="visitor_name_${visitorCount}" required>
+
+        <label for="visitor_contact_${visitorCount}">Contact Number</label>
+        <input type="tel" name="visitor_contact_${visitorCount}" required>
+
+        <label for="visitor_id_type_${visitorCount}">ID Proof Type</label>
+        <select name="visitor_id_type_${visitorCount}" required>
+          <option value="">-- Select ID Proof --</option>
+          <option value="passport">Passport</option>
+          <option value="voter_id">Voter ID</option>
+        </select>
+
+        <label for="visitor_id_file_${visitorCount}">Upload ID Proof</label>
+        <input type="file" name="visitor_id_file_${visitorCount}" accept=".pdf,.jpg,.jpeg,.png" required>
+
+        <button type="button" class="remove-btn">❌ Remove Visitor</button>
+      `;
+
+      container.appendChild(block);
+
+      // Add remove handler
+      block.querySelector(".remove-btn").addEventListener("click", function () {
+        block.remove();
+      });
+
+      visitorCount++;
+    });
+  </script>
+</body>
+</html>
