@@ -24,7 +24,7 @@
       <li><a href="{% url 'profile' %}">My Profile</a></li>
       <li><a href="{% url 'logout' %}">Logout</a></li>
     {% else %}
-      <li><a href="{% url 'signup' %}">Register</a></li>
+      <li><a href="{% url 'signup' %}">Sign Up</a></li>
       <li><a href="{% url 'login' %}">Login</a></li>
     {% endif %}
   </ul>
@@ -51,7 +51,7 @@
       {% if user.is_authenticated %}
         <a href="{% url 'profile' %}" class="btn primary">My Profile</a>
       {% else %}
-        <a href="{% url 'signup' %}" class="btn primary">Register Now</a>
+        <a href="{% url 'signup' %}" class="btn primary">Sign Up</a>
       {% endif %}
       <a href="{% url 'submit' %}" class="btn outline">Submit Abstract</a>
       <a href="{% url 'visitor_registration' %}" class="btn outline">Visitor Registration</a>
