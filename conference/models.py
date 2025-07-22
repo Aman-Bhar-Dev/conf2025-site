@@ -194,7 +194,7 @@ class FinalRegistration(models.Model):
     author_gender = models.CharField(max_length=10, choices=[('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')])
     author_address = models.TextField()
     author_mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    author_id_proof = models.FileField(upload_to='id_proofs/')
+    author_id_proof = models.FileField(upload_to='id_proofs/',storage=RawMediaCloudinaryStorage())
     total_amount = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     presenter_name = models.CharField(max_length=255, blank=True, null=True)
