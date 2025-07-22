@@ -276,112 +276,109 @@ def calculate_fee(category, mode, institute):
 @login_required
 def checkout_view(request, paper_id):
     submission = get_object_or_404(AbstractSubmission, paper_id=paper_id, user=request.user)
-    coauthors = CoAuthor.objects.filter(submission=submission)
+    coauthors  = CoAuthor.objects.filter(submission=submission)
+
+    # Try to load an existing registration (for prefill)
+    registration = FinalRegistration.objects.filter(submission=submission).first()
+    existing_participants = registration.participants.all() if registration else []
 
     if request.method == 'POST':
-        FinalRegistration.objects.filter(submission=submission).delete()
+        # Create or update the registration
+        reg, created = FinalRegistration.objects.get_or_create(submission=submission)
+        # Main author fields
+        reg.author_name        = submission.main_author
+        reg.author_designation = submission.designation
+        reg.author_mode        = request.POST.get('author_mode')
+        reg.author_id_proof    = request.FILES.get('author_identity_proof') or reg.author_id_proof
+        reg.author_contact     = request.POST.get('author_phone')
+        reg.author_address     = request.POST.get('author_address')
+        reg.author_gender      = request.POST.get('author_gender')
+        reg.presenter_name     = request.POST.get('presenter')
+        reg.selected_theme     = request.POST.get('selected_theme')
+        # We’ll compute total_amount below
+        total = calculate_fee(submission.category, reg.author_mode, submission.institute)
 
-        author_mode = request.POST.get('author_mode')
-        author_proof = request.FILES.get('author_identity_proof')
-        author_phone = request.POST.get('author_phone')
-        author_address = request.POST.get('author_address')
-        author_gender = request.POST.get('author_gender')
-        presenter = request.POST.get('presenter')
-        selected_theme = request.POST.get('selected_theme')
-
-
-        if author_mode == "Offline" and not author_proof:
+        # Validation for offline proof
+        if reg.author_mode == "Offline" and not reg.author_id_proof:
             messages.error(request, "Main author selected Offline but did not upload identity proof.")
             return redirect('checkout', paper_id=paper_id)
 
-        total = calculate_fee(submission.category, author_mode, submission.institute)
-
-        registration = FinalRegistration.objects.create(
-            submission=submission,
-            author_name=submission.main_author,
-            author_designation=submission.designation,
-            author_mode=author_mode,
-            author_contact=author_phone,
-            author_address=author_address,
-            author_gender=author_gender,
-            author_id_proof=author_proof,
-            presenter_name=presenter,
-            selected_theme=selected_theme,
-            total_amount=0
-        )
+        # Reset participants
+        reg.save()
+        reg.participants.all().delete()
 
         # Co-authors
         for idx, co in enumerate(coauthors):
-            mode = request.POST.get(f'coauthor_mode_{idx}')
-            proof = request.FILES.get(f'coauthor_proof_{idx}')
-            phone = request.POST.get(f'coauthor_phone_{idx}')
+            mode    = request.POST.get(f'coauthor_mode_{idx}')
+            proof   = request.FILES.get(f'coauthor_proof_{idx}')
+            phone   = request.POST.get(f'coauthor_phone_{idx}')
             address = request.POST.get(f'coauthor_address_{idx}')
-            gender = request.POST.get(f'coauthor_gender_{idx}')
+            gender  = request.POST.get(f'coauthor_gender_{idx}')
 
             if not mode:
-                messages.error(request, f"Mode not selected for co-author {co.first_name} {co.last_name}.")
+                messages.error(request, f"Mode not selected for co-author {co.first_name}.")
                 return redirect('checkout', paper_id=paper_id)
-
             if mode == 'Offline' and not proof:
                 messages.error(request, f"Co-author {co.first_name} selected Offline but did not upload identity proof.")
                 return redirect('checkout', paper_id=paper_id)
 
-            institute = co.affiliation or ''
-            fee = calculate_fee(co.category, mode, institute)
+            fee = calculate_fee(co.category, mode, co.affiliation or '')
             total += fee
 
             FinalParticipant.objects.create(
-                registration=registration,
-                name=f"{co.first_name} {co.last_name}",
-                email=co.email,
-                contact=phone,
-                gender=gender,
-                address=address,
-                role="CoAuthor",
-                mode=mode,
-                id_proof=proof,
-                affiliation=co.affiliation
+                registration=reg,
+                name        = f"{co.first_name} {co.last_name}",
+                email       = co.email,
+                contact     = phone,
+                gender      = gender,
+                address     = address,
+                role        = "CoAuthor",
+                mode        = mode,
+                id_proof    = proof,
+                affiliation = co.affiliation
             )
 
         # Visitors
         visitor_count = 0
         while request.POST.get(f'visitor_name_{visitor_count}'):
-            name = request.POST.get(f'visitor_name_{visitor_count}')
-            email = request.POST.get(f'visitor_email_{visitor_count}')
-            mode = request.POST.get(f'visitor_mode_{visitor_count}')
-            proof = request.FILES.get(f'visitor_proof_{visitor_count}')
-            phone = request.POST.get(f'visitor_phone_{visitor_count}')
+            name    = request.POST.get(f'visitor_name_{visitor_count}')
+            mode    = request.POST.get(f'visitor_mode_{visitor_count}')
+            proof   = request.FILES.get(f'visitor_proof_{visitor_count}')
+            phone   = request.POST.get(f'visitor_phone_{visitor_count}')
             address = request.POST.get(f'visitor_address_{visitor_count}')
-            gender = request.POST.get(f'visitor_gender_{visitor_count}')
+            gender  = request.POST.get(f'visitor_gender_{visitor_count}')
 
             if mode == 'Offline' and not proof:
                 messages.error(request, f"Visitor '{name}' selected Offline but did not upload identity proof.")
                 return redirect('checkout', paper_id=paper_id)
 
-            total += 15000  # Fixed visitor fee
+            total += 15000  # fixed visitor fee
 
             FinalParticipant.objects.create(
-                registration=registration,
-                name=name,
-                email=email,
-                contact=phone,
-                gender=gender,
-                address=address,
-                role="Visitor",
-                mode=mode,
-                id_proof=proof
+                registration = reg,
+                name         = name,
+                email        = request.POST.get(f'visitor_email_{visitor_count}'),
+                contact      = phone,
+                gender       = gender,
+                address      = address,
+                role         = "Visitor",
+                mode         = mode,
+                id_proof     = proof
             )
-
             visitor_count += 1
 
-        registration.total_amount = total
-        registration.save()
+        # Save total
+        reg.total_amount = total
+        reg.save()
 
-        return redirect('payment_summary', paper_id=submission.paper_id)
+        return redirect('payment_summary', paper_id=paper_id)
 
+    # GET → render with any existing values for prefill
     return render(request, 'conference/checkout.html', {
-        'submission': submission,
-        'coauthors': coauthors
+        'submission':          submission,
+        'coauthors':           coauthors,
+        'registration':        registration,
+        'existing_participants': existing_participants,
     })
 
 #qr code related work here#
