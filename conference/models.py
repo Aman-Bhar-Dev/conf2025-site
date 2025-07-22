@@ -236,7 +236,7 @@ class FinalParticipant(models.Model):
     address = models.TextField()
     role = models.CharField(max_length=20, choices=[('CoAuthor', 'Co-Author'), ('Visitor', 'Visitor')])
     mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    id_proof = models.FileField(upload_to='id_proofs/', blank=True, null=True)
+    id_proof = models.FileField(upload_to='id_proofs/', blank=True, null=True, storage=RawMediaCloudinaryStorage())
     affiliation = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return f"{self.name} ({self.role})"
