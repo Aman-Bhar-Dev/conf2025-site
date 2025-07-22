@@ -5,7 +5,7 @@ from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("conference", "0019_finalregistration_has_paid"),
+        ("conference", "0008_finalregistration_selected_theme.py"),
     ]
 
     operations = [
