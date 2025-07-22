@@ -9,37 +9,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.CreateModel(
-            name="VisitorRegistration",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=100)),
-                ("address", models.TextField()),
-                (
-                    "gender",
-                    models.CharField(
-                        choices=[
-                            ("Male", "Male"),
-                            ("Female", "Female"),
-                            ("Other", "Other"),
-                        ],
-                        max_length=10,
-                    ),
-                ),
-                ("phone_number", models.CharField(max_length=15)),
-                ("id_proof", models.FileField(upload_to="visitor_id_proofs/")),
-                ("number_of_visitors", models.PositiveIntegerField(default=1)),
-                ("is_approved", models.BooleanField(default=False)),
-                ("is_paid", models.BooleanField(default=False)),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
+
             ],
         ),
     ]
