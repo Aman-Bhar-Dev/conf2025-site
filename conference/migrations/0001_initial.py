@@ -219,14 +219,7 @@ class Migration(migrations.Migration):
                         max_length=10,
                     ),
                 ),
-                (
-                    "author_identity_proof",
-                    models.FileField(
-                        storage=cloudinary_storage.storage.RawMediaCloudinaryStorage(),
-                        upload_to="identity_proofs/",
-                    ),
-                ),
-                ("total_amount", models.IntegerField()),
+                ("total_amount", models.PositiveIntegerField(default=0)),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
                 (
                     "submission",
@@ -235,136 +228,90 @@ class Migration(migrations.Migration):
                         to="conference.abstractsubmission",
                     ),
                 ),
-            ],
-        ),
-        migrations.CreateModel(
-            name="FinalParticipant",
-            fields=[
+                ("author_address", models.TextField(default="N/A")),
+                ("author_contact", models.CharField(default="N/A", max_length=20)),
+                ("author_designation", models.CharField(default="N/A", max_length=100)),
                 (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=255)),
-                ("email", models.EmailField(max_length=254)),
-                ("affiliation", models.CharField(max_length=255)),
-                (
-                    "role",
-                    models.CharField(
-                        choices=[("CoAuthor", "Co-Author"), ("Visitor", "Visitor")],
-                        max_length=20,
-                    ),
-                ),
-                (
-                    "mode",
-                    models.CharField(
-                        choices=[("Online", "Online"), ("Offline", "Offline")],
-                        max_length=10,
-                    ),
-                ),
-                (
-                    "identity_proof",
-                    models.FileField(
-                        blank=True,
-                        null=True,
-                        storage=cloudinary_storage.storage.RawMediaCloudinaryStorage(),
-                        upload_to="identity_proofs/",
-                    ),
-                ),
-                (
-                    "registration",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="participants",
-                        to="conference.finalregistration",
-                    ),
-                ),
-            ],
-        ),
-        migrations.CreateModel(
-            name="ParticipationInfo",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                (
-                    "author_participation_mode",
-                    models.CharField(
-                        choices=[("Online", "Online"), ("Offline", "Offline")],
-                        max_length=10,
-                    ),
-                ),
-                (
-                    "author_identity_proof",
-                    models.FileField(
-                        blank=True,
-                        null=True,
-                        storage=cloudinary_storage.storage.RawMediaCloudinaryStorage(),
-                        upload_to="identity_proofs/",
-                    ),
-                ),
-                ("total_amount", models.IntegerField(default=0)),
-                ("confirmed_on", models.DateTimeField(auto_now_add=True)),
-                (
-                    "submission",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        to="conference.abstractsubmission",
-                    ),
-                ),
-            ],
-        ),
-        migrations.CreateModel(
-            name="CoAuthorParticipation",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name="ID",
-                    ),
-                ),
-                ("name", models.CharField(max_length=255)),
-                ("email", models.EmailField(max_length=254)),
-                (
-                    "participation_mode",
+                    "author_gender",
                     models.CharField(
                         choices=[
-                            ("None", "Not Attending"),
-                            ("Online", "Online"),
-                            ("Offline", "Offline"),
+                            ("Male", "Male"),
+                            ("Female", "Female"),
+                            ("Other", "Other"),
                         ],
-                        default="None",
+                        default="N/A",
                         max_length=10,
                     ),
                 ),
                 (
-                    "identity_proof",
+                    "author_id_proof",
                     models.FileField(
+                        storage=cloudinary_storage.storage.RawMediaCloudinaryStorage(),
+                        upload_to="id_proofs/",
+                    ),
+                ),
+                ("author_name", models.CharField(default="N/A", max_length=255)),
+                (
+                    "payment_screenshot",
+                    models.ImageField(
                         blank=True,
                         null=True,
                         storage=cloudinary_storage.storage.RawMediaCloudinaryStorage(),
-                        upload_to="identity_proofs/",
+                        upload_to="payment_screenshots/",
                     ),
                 ),
+                ("payment_verified", models.BooleanField(default=False)),
                 (
-                    "participation_info",
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="coauthor_details",
-                        to="conference.participationinfo",
+                    "presenter_name",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+                ("fee_breakdown", models.TextField(blank=True)),
+                ("transaction_date", models.DateField(blank=True, null=True)),
+                (
+                    "transaction_id",
+                    models.CharField(blank=True, max_length=100, null=True),
+                ),
+                ("transaction_time", models.TimeField(blank=True, null=True)),
+                (
+                    "selected_theme",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            (
+                                "Society, Equity, Transformation & Social Work",
+                                "Society, Equity, Transformation & Social Work",
+                            ),
+                            (
+                                "Knowledge, Education & Human Development",
+                                "Knowledge, Education & Human Development",
+                            ),
+                            (
+                                "Politics, Governance, Public Policy, and Political Science",
+                                "Politics, Governance, Public Policy, and Political Science",
+                            ),
+                            (
+                                "Economy, Technology & Social Impact",
+                                "Economy, Technology & Social Impact",
+                            ),
+                            (
+                                "Culture, Identity & Globalization",
+                                "Culture, Identity & Globalization",
+                            ),
+                            (
+                                "Environment, Climate & Sustainability",
+                                "Environment, Climate & Sustainability",
+                            ),
+                            (
+                                "Business, Commerce and Business Sustainability",
+                                "Business, Commerce and Business Sustainability",
+                            ),
+                            (
+                                "General Social Science and Topics Not Falling Under the Above Categories",
+                                "General Social Science and Topics Not Falling Under the Above Categories",
+                            ),
+                        ],
+                        max_length=200,
+                        null=True,
                     ),
                 ),
             ],
@@ -389,6 +336,137 @@ class Migration(migrations.Migration):
                         on_delete=django.db.models.deletion.CASCADE,
                         related_name="profile",
                         to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="FinalParticipant",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("email", models.EmailField(blank=True, max_length=254, null=True)),
+                (
+                    "role",
+                    models.CharField(
+                        choices=[("CoAuthor", "Co-Author"), ("Visitor", "Visitor")],
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "mode",
+                    models.CharField(
+                        choices=[("Online", "Online"), ("Offline", "Offline")],
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "registration",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="participants",
+                        to="conference.finalregistration",
+                    ),
+                ),
+                ("address", models.TextField(default="N/A")),
+                ("contact", models.CharField(default="N/A", max_length=20)),
+                (
+                    "gender",
+                    models.CharField(
+                        choices=[
+                            ("Male", "Male"),
+                            ("Female", "Female"),
+                            ("Other", "Other"),
+                        ],
+                        default="N/A",
+                        max_length=10,
+                    ),
+                ),
+                (
+                    "id_proof",
+                    models.FileField(blank=True, null=True, upload_to="id_proofs/"),
+                ),
+                (
+                    "affiliation",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="VisitorRegistration",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("email", models.EmailField(max_length=254)),
+                ("contact", models.CharField(max_length=15)),
+                ("address", models.TextField()),
+                (
+                    "id_proof_type",
+                    models.CharField(
+                        choices=[("passport", "Passport"), ("voter_id", "Voter ID")],
+                        max_length=20,
+                    ),
+                ),
+                ("id_proof_file", models.FileField(upload_to="identity_proofs/")),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("Pending", "Pending"),
+                            ("Approved", "Approved"),
+                            ("Rejected", "Rejected"),
+                        ],
+                        default="Pending",
+                        max_length=10,
+                    ),
+                ),
+            ],
+        ),
+        migrations.CreateModel(
+            name="AdditionalVisitor",
+            fields=[
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("contact", models.CharField(max_length=15)),
+                (
+                    "id_proof_type",
+                    models.CharField(
+                        choices=[("passport", "Passport"), ("voter_id", "Voter ID")],
+                        max_length=20,
+                    ),
+                ),
+                ("id_proof_file", models.FileField(upload_to="identity_proofs/")),
+                (
+                    "group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="additional_visitors",
+                        to="conference.visitorregistration",
                     ),
                 ),
             ],
