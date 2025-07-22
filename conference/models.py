@@ -210,15 +210,23 @@ class FinalRegistration(models.Model):
     )
     payment_verified = models.BooleanField(default=False)
 
-
-    # 🔽 New fields
-    payment_screenshot = models.ImageField(upload_to='payment_screenshots/', blank=True, null=True, storage=RawMediaCloudinaryStorage())
-    payment_verified = models.BooleanField(default=False)
+    # 🔽 Payment screenshot upload (Cloudinary)
+    payment_screenshot = models.ImageField(
+        upload_to='payment_screenshots/',
+        blank=True,
+        null=True,
+        storage=RawMediaCloudinaryStorage()
+    )
 
     def __str__(self):
         return f"{self.submission.paper_id} - Final Registration"
 
+    # ✅ Admin helper method
+    def has_paid(self):
+        return bool(self.transaction_id and self.payment_screenshot)
 
+    has_paid.boolean = True
+    has_paid.short_description = "Payment Done?"
 class FinalParticipant(models.Model):
     registration = models.ForeignKey(FinalRegistration, on_delete=models.CASCADE, related_name='participants')
     name = models.CharField(max_length=255)
@@ -228,7 +236,7 @@ class FinalParticipant(models.Model):
     address = models.TextField()
     role = models.CharField(max_length=20, choices=[('CoAuthor', 'Co-Author'), ('Visitor', 'Visitor')])
     mode = models.CharField(max_length=10, choices=[('Online', 'Online'), ('Offline', 'Offline')])
-    id_proof = models.FileField(upload_to='id_proofs/', blank=True, null=True,storage=RawMediaCloudinaryStorage())
+    id_proof = models.FileField(upload_to='id_proofs/', blank=True, null=True)
     affiliation = models.CharField(max_length=255, blank=True, null=True)
     def __str__(self):
         return f"{self.name} ({self.role})"
@@ -254,7 +262,7 @@ class VisitorRegistration(models.Model):
     contact        = models.CharField(max_length=15)
     address        = models.TextField()
     id_proof_type  = models.CharField(max_length=20, choices=ID_PROOF_CHOICES)
-    id_proof_file  = models.FileField(upload_to='identity_proofs/',storage=RawMediaCloudinaryStorage())
+    id_proof_file  = models.FileField(upload_to='identity_proofs/')
     status         = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     timestamp      = models.DateTimeField(auto_now_add=True)
 
@@ -266,7 +274,7 @@ class AdditionalVisitor(models.Model):
     name = models.CharField(max_length=100)
     contact = models.CharField(max_length=15)
     id_proof_type = models.CharField(max_length=20, choices=ID_PROOF_CHOICES)
-    id_proof_file = models.FileField(upload_to='identity_proofs/',storage=RawMediaCloudinaryStorage())
+    id_proof_file = models.FileField(upload_to='identity_proofs/')
 
     def __str__(self):
         return f"{self.name} ({self.contact})"
