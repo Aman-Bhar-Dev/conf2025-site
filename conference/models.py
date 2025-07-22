@@ -262,7 +262,7 @@ class VisitorRegistration(models.Model):
     contact        = models.CharField(max_length=15)
     address        = models.TextField()
     id_proof_type  = models.CharField(max_length=20, choices=ID_PROOF_CHOICES)
-    id_proof_file  = models.FileField(upload_to='identity_proofs/')
+    id_proof_file  = models.FileField(upload_to='identity_proofs/'storage=RawMediaCloudinaryStorage())
     status         = models.CharField(max_length=10, choices=STATUS_CHOICES, default='Pending')
     timestamp      = models.DateTimeField(auto_now_add=True)
 
