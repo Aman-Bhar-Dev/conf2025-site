@@ -10,6 +10,11 @@ class AbstractSubmissionResource(resources.ModelResource):
         column_name='Phone Number',
         attribute='user__profile__phone',
     )
+    mode_of_participation = fields.Field(
+    column_name='Mode of Participation',
+    attribute='mode_of_participation'
+    )
+
 
     # CoAuthor 1
     coauthor1_name        = fields.Field(column_name='CoAuthor1 Name')
@@ -44,7 +49,7 @@ class AbstractSubmissionResource(resources.ModelResource):
     class Meta:
         model = AbstractSubmission
         fields = (
-            'paper_id', 'title', 'name', 'email', 'phone', 'institute', 'designation',
+            'paper_id', 'title','mode_of_participation', 'name', 'email', 'phone', 'institute', 'designation',
             'keywords', 'status', 'submitted_on',
             'coauthor1_name', 'coauthor1_email', 'coauthor1_designation', 'coauthor1_affiliation',
             'coauthor2_name', 'coauthor2_email', 'coauthor2_designation', 'coauthor2_affiliation',
