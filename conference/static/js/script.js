@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Countdown timer
-  const targetDate = new Date("July 30, 2025 00:00:00").getTime();
+  const targetDate = new Date("July 31, 2025 00:00:00").getTime();
   const countdown = () => {
     const now = new Date().getTime();
     const gap = targetDate - now;
