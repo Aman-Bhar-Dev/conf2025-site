@@ -199,6 +199,11 @@
     }
   }
 </script>
+  <script>
+  document
+    .querySelectorAll('select[name="mode_of_participation"] option[value="Offline"]')
+    .forEach(opt => opt.remove());
+</script>
 
 </body>
 </html>
