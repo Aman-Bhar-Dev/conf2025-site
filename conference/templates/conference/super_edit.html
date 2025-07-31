@@ -1,0 +1,23 @@
+{% extends 'admin/base_site.html' %}
+{% block content %}
+<h2>Edit Abstract – ID {{ obj.id }}</h2>
+
+<form method="post">{% csrf_token %}
+    <label>Paper ID:</label><br>
+    <input type="text" name="paper_id" value="{{ obj.paper_id }}"><br><br>
+
+    <label>Mode of Participation:</label><br>
+    <select name="mode">
+        <option value="online" {% if obj.mode == "online" %}selected{% endif %}>Online</option>
+        <option value="offline" {% if obj.mode == "offline" %}selected{% endif %}>Offline</option>
+    </select><br><br>
+
+    <label>Submitted On (YYYY-MM-DD HH:MM):</label><br>
+    <input type="text" name="submitted_on" value="{{ obj.submitted_on|date:"Y-m-d H:i" }}"><br><br>
+
+    <button type="submit">💾 Save</button>
+</form>
+
+<br>
+<a href="/admin/conference/abstractsubmission/">← Back to Admin</a>
+{% endblock %}
