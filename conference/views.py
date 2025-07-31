@@ -643,3 +643,18 @@ def visitor_registration_view(request):
         return render(request, 'conference/visitor_confirmation.html')
 
     return render(request, 'conference/visitor_registration.html')
+
+
+@staff_member_required
+def super_edit_abstract(request, paper_id):
+    obj = get_object_or_404(AbstractSubmission, paper_id=paper_id)
+
+    if request.method == 'POST':
+        obj.paper_id = request.POST.get('paper_id')
+        obj.mode = request.POST.get('mode')
+        obj.submitted_on = request.POST.get('submitted_on')
+        obj.save()
+        return redirect('/admin/conference/abstractsubmission/')
+
+    return render(request, 'conference/super_edit.html', {'obj': obj})
+
