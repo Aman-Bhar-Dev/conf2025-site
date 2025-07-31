@@ -644,7 +644,7 @@ def visitor_registration_view(request):
 
     return render(request, 'conference/visitor_registration.html')
 
-
+from django.contrib.admin.views.decorators import staff_member_required
 @staff_member_required
 def super_edit_abstract(request, paper_id):
     obj = get_object_or_404(AbstractSubmission, paper_id=paper_id)
