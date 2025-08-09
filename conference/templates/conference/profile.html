@@ -86,7 +86,7 @@
                     {# 1) never checked out -> Make Payment #}
                     {% with fr=submission.finalregistration %}
                       {% if not fr %}
-                        <a href= # class="pay-button">Payment Temporarily Closed</a>
+                        <a href="{% url 'checkout' submission.paper_id %}" class="pay-button">Make Payment</a>
                       {% elif not fr.transaction_id %}
                         <a href="{% url 'payment_summary' submission.paper_id %}" class="pay-button">Continue Payment</a>
                       {% elif not fr.payment_verified %}
