@@ -85,62 +85,64 @@ class AbstractSubmissionResource(resources.ModelResource):
     def dehydrate_coauthor5_email(self, obj):       return obj.get_coauthor5_email()
     def dehydrate_coauthor5_designation(self, obj): return obj.get_coauthor5_designation()
     def dehydrate_coauthor5_affiliation(self, obj): return obj.get_coauthor5_affiliation()
-# conference/resources.py
-from import_export import resources, fields
-from .models import FinalRegistration, FinalParticipant
+# conference/resources.pyfrom import_export import resources, fields
+from .models import FinalRegistration
 
 class FinalRegistrationResource(resources.ModelResource):
-    paper_id          = fields.Field(column_name='Paper ID', attribute='submission__paper_id')
-    main_author_name  = fields.Field(column_name='Main Author', attribute='author_name')
-    main_author_email = fields.Field(column_name='Main Author Email',
-                                     attribute='submission__user__email')
-    main_author_institute = fields.Field(column_name='Main Author Institute',
-                                         attribute='submission__institute')
-    main_author_designation = fields.Field(column_name='Main Author Designation',
-                                           attribute='author_designation')
-    author_contact    = fields.Field(column_name='Author Contact', attribute='author_contact')
-    author_address    = fields.Field(column_name='Author Address', attribute='author_address')
-    author_gender     = fields.Field(column_name='Author Gender', attribute='author_gender')
-    author_mode       = fields.Field(column_name='Author Mode', attribute='author_mode')
+    paper_id               = fields.Field(column_name='Paper ID', attribute='submission__paper_id')
+    title                  = fields.Field(column_name='Title', attribute='submission__title')
+    selected_theme         = fields.Field(column_name='Selected Theme')  # dehydrate below will supply readable label
 
-    coauthors = fields.Field(column_name='Co-Authors')
-    visitors  = fields.Field(column_name='Visitors')
-    title = fields.Field(column_name='Title', attribute='submission__title')
-    selected_theme = fields.Field(column_name='Selected Theme', attribute='selected_theme')
+    main_author_name       = fields.Field(column_name='Main Author', attribute='author_name')
+    main_author_email      = fields.Field(column_name='Main Author Email', attribute='submission__user__email')
+    main_author_institute  = fields.Field(column_name='Main Author Institute', attribute='submission__institute')
+    main_author_designation= fields.Field(column_name='Main Author Designation', attribute='author_designation')
 
+    author_contact         = fields.Field(column_name='Author Contact', attribute='author_contact')
+    author_address         = fields.Field(column_name='Author Address', attribute='author_address')
+    author_gender          = fields.Field(column_name='Author Gender', attribute='author_gender')
+    author_mode            = fields.Field(column_name='Author Mode', attribute='author_mode')
 
-    total_amount      = fields.Field(column_name='Total Amount', attribute='total_amount')
+    coauthors              = fields.Field(column_name='Co-Authors')
+    visitors               = fields.Field(column_name='Visitors')
+
+    total_amount           = fields.Field(column_name='Total Amount', attribute='total_amount')
 
     class Meta:
         model = FinalRegistration
+        # explicitly list/export fields in the order you want
         fields = (
-        'paper_id',
-        'title',
-        'selected_theme',
-        'main_author_name', 'main_author_email', 'main_author_institute',
-        'main_author_designation', 'author_contact','author_address',
-        'author_gender','author_mode',
-        'coauthors','visitors',
-        'total_amount',
+            'paper_id', 'title', 'selected_theme',
+            'main_author_name', 'main_author_email', 'main_author_institute', 'main_author_designation',
+            'author_contact', 'author_address', 'author_gender', 'author_mode',
+            'coauthors', 'visitors',
+            'total_amount',
         )
+        export_order = fields  # <-- THIS line below is fine only because we've defined a local variable `fields` above
+        # If you prefer an explicit tuple:
+        # export_order = (
+        #    'paper_id', 'title', 'selected_theme', 'main_author_name', ... ,'total_amount'
+        # )
 
-        export_order = fields
+    def dehydrate_selected_theme(self, reg):
+        # For a choices CharField, this returns the display label.
+        if hasattr(reg, 'get_selected_theme_display'):
+            return reg.get_selected_theme_display() or ''
+        # Fallback just in case it's None or plain text
+        return str(reg.selected_theme or '')
 
     def dehydrate_coauthors(self, reg):
         parts = []
         for p in reg.participants.filter(role='CoAuthor'):
-            parts.append(
-              f"{p.name} ({p.email}, {p.contact}, {p.mode})"
-            )
+            parts.append(f"{p.name} ({p.email or 'N/A'}, {p.contact}, {p.mode})")
         return "; ".join(parts) or "—"
 
     def dehydrate_visitors(self, reg):
         parts = []
         for p in reg.participants.filter(role='Visitor'):
-            parts.append(
-              f"{p.name} ({p.email or 'N/A'}, {p.contact}, {p.mode})"
-            )
+            parts.append(f"{p.name} ({p.email or 'N/A'}, {p.contact}, {p.mode})")
         return "; ".join(parts) or "—"
+
 
 from import_export import resources, fields
 from .models import VisitorRegistration, AdditionalVisitor
