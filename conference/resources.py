@@ -116,7 +116,7 @@ class FinalRegistrationResource(resources.ModelResource):
             'paper_id', 'title', 'selected_theme',
             'main_author_name', 'main_author_email', 'main_author_institute', 'main_author_designation',
             'author_contact', 'author_address', 'author_gender', 'author_mode',
-            'coauthors', 'visitors', 'presenter_name'
+            'coauthors', 'visitors', 'presenter_name',
             'total_amount',
         )
         export_order = fields  # <-- THIS line below is fine only because we've defined a local variable `fields` above
