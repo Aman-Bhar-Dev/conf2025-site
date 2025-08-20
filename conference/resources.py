@@ -105,6 +105,7 @@ class FinalRegistrationResource(resources.ModelResource):
 
     coauthors              = fields.Field(column_name='Co-Authors')
     visitors               = fields.Field(column_name='Visitors')
+    presenter_name = fields.Field(column_name='Presenter Name', attribute='presenter_name')
 
     total_amount           = fields.Field(column_name='Total Amount', attribute='total_amount')
 
@@ -115,7 +116,7 @@ class FinalRegistrationResource(resources.ModelResource):
             'paper_id', 'title', 'selected_theme',
             'main_author_name', 'main_author_email', 'main_author_institute', 'main_author_designation',
             'author_contact', 'author_address', 'author_gender', 'author_mode',
-            'coauthors', 'visitors',
+            'coauthors', 'visitors', 'presenter_name'
             'total_amount',
         )
         export_order = fields  # <-- THIS line below is fine only because we've defined a local variable `fields` above
