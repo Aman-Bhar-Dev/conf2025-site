@@ -14,6 +14,9 @@ class AbstractSubmissionResource(resources.ModelResource):
     column_name='Mode of Participation',
     attribute='mode_of_participation'
     )
+    full_paper_url = fields.Field(column_name="Full Paper URL")
+    full_paper_filename = fields.Field(column_name="Full Paper Filename")
+
 
 
     # CoAuthor 1
@@ -56,6 +59,7 @@ class AbstractSubmissionResource(resources.ModelResource):
             'coauthor3_name', 'coauthor3_email', 'coauthor3_designation', 'coauthor3_affiliation',
             'coauthor4_name', 'coauthor4_email', 'coauthor4_designation', 'coauthor4_affiliation',
             'coauthor5_name', 'coauthor5_email', 'coauthor5_designation', 'coauthor5_affiliation',
+            'full_paper_url', 'full_paper_filename',
         )
 
     # No need for a dehydrate_phone method anymore,
@@ -85,6 +89,20 @@ class AbstractSubmissionResource(resources.ModelResource):
     def dehydrate_coauthor5_email(self, obj):       return obj.get_coauthor5_email()
     def dehydrate_coauthor5_designation(self, obj): return obj.get_coauthor5_designation()
     def dehydrate_coauthor5_affiliation(self, obj): return obj.get_coauthor5_affiliation()
+    def dehydrate_full_paper_url(self, obj):
+        try:
+            return obj.full_paper.url if obj.full_paper else ""
+        except Exception:
+            return ""
+
+    def dehydrate_full_paper_filename(self, obj):
+        import os, urllib.parse
+        url = self.dehydrate_full_paper_url(obj)
+        if not url:
+            return ""
+        path = urllib.parse.urlsplit(url).path
+        return urllib.parse.unquote(os.path.basename(path))
+
 # conference/resources.pyfrom import_export import resources, fields
 from .models import FinalRegistration
 
